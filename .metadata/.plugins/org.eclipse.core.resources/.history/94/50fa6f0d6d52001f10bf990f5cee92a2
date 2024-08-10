@@ -1,0 +1,30 @@
+package com.techlabs.app.controller;
+
+import java.util.List;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.techlabs.app.entity.Instructor;
+import com.techlabs.app.service.BlogService;
+
+@RestController
+@RequestMapping("/api/blog")
+public class BlogController {
+	
+	
+	private BlogService blogService;
+
+	public BlogController(BlogService blogService) {
+		super();
+		this.blogService = blogService;
+	}
+	
+	@GetMapping
+	public List<Blog> getAllInstructors(){
+		return instructorService.findAllInstructors();
+	}
+	
+
+}

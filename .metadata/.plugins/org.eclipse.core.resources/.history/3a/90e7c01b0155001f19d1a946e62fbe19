@@ -1,0 +1,131 @@
+package com.techlabs.app.controller;
+
+import java.time.LocalDateTime;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.techlabs.app.dto.AccountDTO;
+import com.techlabs.app.dto.TransactionDTO;
+import com.techlabs.app.dto.UserDTO;
+import com.techlabs.app.service.AdminService;
+import com.techlabs.app.util.PagedResponse;
+
+import jakarta.validation.Valid;
+
+
+@RestController
+@RequestMapping("/api/admin")
+public class AdminController {
+	
+	private AdminService adminService;
+	
+	
+	public AdminController(AdminService adminService) {
+		super();
+		this.adminService = adminService;
+	}
+
+	@GetMapping("/users")
+	public ResponseEntity<PagedResponse<UserDTO>> getAllUsers(
+			@RequestParam(name = "page", defaultValue = "0") int page,
+			@RequestParam(name = "size", defaultValue = "5") int size,
+			@RequestParam(name = "sortBy", defaultValue = "id") String sortBy,
+			@RequestParam(name = "direction", defaultValue = "asc") String direction){
+		
+		PagedResponse<UserDTO> users = adminService.getAllUsers(page,size,sortBy,direction);
+		
+		return new ResponseEntity<PagedResponse<UserDTO>>(users, HttpStatus.OK);
+		
+	}
+	
+	@GetMapping("{/users/id}")
+	public ResponseEntity<UserDTO> getUserById(@PathVariable(name="id")int userId){
+		UserDTO user = adminService.getUserById(userId);
+		
+		return new ResponseEntity<UserDTO>(user, HttpStatus.OK);
+		
+	}
+	
+	@GetMapping("/users/starts-with")
+	public ResponseEntity<PagedResponse<UserDTO>> getAllUsersByFirstNameStartsWith(
+			@RequestParam(name = "page", defaultValue = "0") int page,
+			@RequestParam(name = "size", defaultValue = "5") int size,
+			@RequestParam(name = "sortBy", defaultValue = "id") String sortBy,
+			@RequestParam(name = "direction", defaultValue = "asc") String direction,
+			@RequestParam(name = "startsWith") String startWith){
+		
+		PagedResponse<UserDTO> users = adminService.getAllUsersByFirstNameStartsWith(page,size,sortBy,direction,startWith);
+		
+		return new ResponseEntity<PagedResponse<UserDTO>>(users, HttpStatus.OK);
+		
+	}
+	
+	
+	@GetMapping("/transaction")
+	public ResponseEntity<PagedResponse<TransactionDTO>> getAllTransactions(
+			@RequestParam(name = "page", defaultValue = "0") int page,
+			@RequestParam(name = "size", defaultValue = "5") int size,
+			@RequestParam(name = "sortBy", defaultValue = "id") String sortBy,
+			@RequestParam(name = "direction", defaultValue = "asc") String direction){
+		
+		PagedResponse<TransactionDTO> transactions = adminService.getAllTransactions(page,size,sortBy,direction);
+		
+		return new ResponseEntity<PagedResponse<TransactionDTO>>(transactions, HttpStatus.OK);
+		
+	}
+	
+	@GetMapping("/transaction/date")
+	public ResponseEntity<PagedResponse<TransactionDTO>> getAllTransactionsBetweenDate(
+			@RequestParam(name = "page", defaultValue = "0") int page,
+			@RequestParam(name = "size", defaultValue = "5") int size,
+			@RequestParam(name = "sortBy", defaultValue = "id") String sortBy,
+			@RequestParam(name = "direction", defaultValue = "asc") String direction,
+			@RequestParam(name = "startDate") LocalDateTime startDate,
+			@RequestParam(name = "endDate") LocalDateTime endDate){
+		
+		PagedResponse<TransactionDTO> transactions = adminService.getAllTransactionsBetweenDate(page,size,sortBy,direction,startDate,endDate);
+		
+		return new ResponseEntity<PagedResponse<TransactionDTO>>(transactions, HttpStatus.OK);
+		
+	}
+	
+	@GetMapping("/transaction/user/{id}")
+	public ResponseEntity<PagedResponse<TransactionDTO>> getAllTransactionsByUserId(
+			@RequestParam(name = "page", defaultValue = "0") int page,
+			@RequestParam(name = "size", defaultValue = "5") int size,
+			@RequestParam(name = "sortBy", defaultValue = "id") String sortBy,
+			@RequestParam(name = "direction", defaultValue = "asc") String direction,
+			@PathVariable(name="id")int userId){
+		
+		PagedResponse<TransactionDTO> transactions = adminService.getAllTransactionsByUserId(userId,page,size,sortBy,direction);
+		
+		return new ResponseEntity<PagedResponse<TransactionDTO>>(transactions, HttpStatus.OK);
+		
+	}
+	
+	@PostMapping("/user")
+	public ResponseEntity<UserDTO> createUser(@Valid @RequestBody UserDTO UserDTO){
+		UserDTO addedUser = adminService.createUser(UserDTO);
+		
+		return new ResponseEntity<UserDTO>(addedUser, HttpStatus.CREATED);
+		
+	}
+	
+	
+	@PostMapping("/user/{id}")
+	public ResponseEntity<UserDTO> createUserAccount(@Valid @RequestBody AccountDTO accountDTO){
+		UserDTO addedUserWithAccount = adminService.createUserAccount(accountDTO);
+		
+		return new ResponseEntity<UserDTO>(addedUserWithAccount, HttpStatus.CREATED);
+		
+	}
+
+}

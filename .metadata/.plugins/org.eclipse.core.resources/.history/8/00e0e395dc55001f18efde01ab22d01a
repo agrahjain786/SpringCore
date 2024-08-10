@@ -1,0 +1,322 @@
+package com.techlabs.app.service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.techlabs.app.dto.AccountDTO;
+import com.techlabs.app.dto.TransactionDTO;
+import com.techlabs.app.dto.UserDTO;
+import com.techlabs.app.dto.UserResponseDTO;
+import com.techlabs.app.entity.Account;
+import com.techlabs.app.entity.Role;
+import com.techlabs.app.entity.Transaction;
+import com.techlabs.app.entity.User;
+import com.techlabs.app.exception.AccountException;
+import com.techlabs.app.exception.UserException;
+import com.techlabs.app.repository.AccountRepository;
+import com.techlabs.app.repository.RoleRepository;
+import com.techlabs.app.repository.TransactionRepository;
+import com.techlabs.app.repository.UserRepository;
+import com.techlabs.app.util.PagedResponse;
+
+
+@Service
+public class AdminServiceImpl implements AdminService{
+	
+	private AccountRepository accountRepository;
+	
+	private TransactionRepository transactionRepository;
+	
+	private UserRepository userRepository;
+	
+	private RoleRepository roleRepository;
+	
+	private PasswordEncoder passwordEncoder;
+
+	public AdminServiceImpl(AccountRepository accountRepository, TransactionRepository transactionRepository,
+			UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+		super();
+		this.accountRepository = accountRepository;
+		this.transactionRepository = transactionRepository;
+		this.userRepository = userRepository;
+		this.roleRepository = roleRepository;
+		this.passwordEncoder = passwordEncoder;
+	}
+
+	@Override
+	public PagedResponse<UserResponseDTO> getAllUsers(int page, int size, String sortBy, String direction) {
+		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+		
+		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+		
+		Page<User> pages = userRepository.findAll(pageable);
+		List<User> allUsers = pages.getContent();
+		List<UserResponseDTO> allUsersDTO = convertUserListEntityToDTO(allUsers);
+		
+		return new PagedResponse<UserResponseDTO>(allUsersDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+	}
+
+
+	@Override
+	public UserResponseDTO getUserById(int userId) {
+		User user = userRepository.findById(userId).orElseThrow(()->new UserException("User Not Found!"));
+		
+		return convertUserEntityToDTO(user);
+	}
+
+	@Override
+	public PagedResponse<UserResponseDTO> getAllUsersByFirstNameStartsWith(int page, int size, String sortBy, String direction,
+			String startWith) {
+		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+		
+		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+		
+		Page<User> pages = userRepository.findByFirstNameStartingWith(startWith, pageable);
+		List<User> allUsers = pages.getContent();
+		List<UserResponseDTO> allUsersDTO = convertUserListEntityToDTO(allUsers);
+		
+		return new PagedResponse<UserResponseDTO>(allUsersDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+	}
+
+	@Override
+	public PagedResponse<TransactionDTO> getAllTransactions(int page, int size, String sortBy, String direction) {
+		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+		
+		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+		
+		Page<Transaction> pages = transactionRepository.findAll(pageable);
+		List<Transaction> allTransactions = pages.getContent();
+		List<TransactionDTO> allTransactionsDTO = convertTransactionListEntityToDTO(allTransactions);
+		
+		return new PagedResponse<TransactionDTO>(allTransactionsDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+	}
+
+	
+
+	@Override
+	public PagedResponse<TransactionDTO> getAllTransactionsBetweenDate(int page, int size, String sortBy,
+			String direction, LocalDateTime startDate, LocalDateTime endDate) {
+		
+		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+		
+		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+		
+		Page<Transaction> pages = transactionRepository.findByTransactionDateBetween(startDate, endDate, pageable);
+		List<Transaction> allTransactions = pages.getContent();
+		List<TransactionDTO> allTransactionsDTO = convertTransactionListEntityToDTO(allTransactions);
+		
+		return new PagedResponse<TransactionDTO>(allTransactionsDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+	}
+
+	@Override
+	public PagedResponse<TransactionDTO> getAllTransactionsByAccountNumber(int page, int size, String sortBy,
+			String direction,int accountNumber) {
+		Account account = accountRepository.findById(accountNumber).orElseThrow(()->new AccountException("Account Not Found!"));
+		
+		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+		
+		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+		
+		Page<Transaction> pages = transactionRepository.findBySenderAccountNumberOrReceiverAccountNumber(accountNumber, accountNumber,pageable);
+		List<Transaction> allTransactions = pages.getContent();
+		List<TransactionDTO> allTransactionsDTO = convertTransactionListEntityToDTO(allTransactions);
+		
+		return new PagedResponse<TransactionDTO>(allTransactionsDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+	}
+
+	@Override
+	public UserResponseDTO createAdmin(UserDTO userDTO) {
+		userDTO.setId(0);
+		User user = convertUserDTOToEntity(userDTO);
+		userRepository.save(user);
+		return convertUserEntityToDTO(user);
+	}
+
+	
+
+
+	@Override
+	public UserResponseDTO createUserAccount(int userId, AccountDTO accountDTO) {
+		if(accountDTO.getBalance() < 1000) throw new AccountException("Initial Balance of account must be greater than 1000");
+		
+		User user = userRepository.findById(userId).orElseThrow(()->new UserException("User Not Found!"));
+		
+		boolean hasUserRole = user.getRoles().stream()
+	            .anyMatch(role -> role.getName().equals("ROLE_USER"));
+		
+		if (!hasUserRole) {
+	        throw new UserException("User does not have the required role to make the account");
+	    }
+		
+		Account account = convertDTOToAccountEntity(accountDTO);
+		account.setUser(user);
+		user.getAccounts().add(account);
+		userRepository.save(user);
+		return convertUserEntityToDTO(user);
+	}
+
+	@Override
+	public void deleteUser(int userId) {
+		User user = userRepository.findById(userId).orElseThrow(()->new UserException("User Not Found!"));
+		
+		boolean hasUserRole = user.getRoles().stream()
+	            .anyMatch(role -> role.getName().equals("ROLE_USER"));
+		
+		if (!hasUserRole) {
+	        throw new UserException("Cannot delete the user beacuse user is admin");
+	    }
+		userRepository.delete(user);
+		
+	}
+
+	@Override
+	public void deleteUserAccount(int userId, int accountNumber) {
+		User user = userRepository.findById(userId).orElseThrow(()->new UserException("User Not Found!"));
+		
+		boolean hasUserRole = user.getRoles().stream()
+	            .anyMatch(role -> role.getName().equals("ROLE_USER"));
+		
+		if (!hasUserRole) {
+	        throw new UserException("There is not Account as User is not Customer");
+	    }
+		
+		Account account = accountRepository.findById(accountNumber).orElseThrow(()->new AccountException("Account Not Found!"));
+		
+		if (!user.getAccounts().contains(account)) {
+	        throw new AccountException("Account does not belong to the user!");
+	    }
+		user.getAccounts().remove(account);
+	    userRepository.save(user);
+	}
+	
+	
+	@Override
+	public UserResponseDTO getAdminProfile() {
+		String usernameOrEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+	    User admin = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
+	        .orElseThrow(() -> new UserException("Admin not found!"));
+	    
+	    UserResponseDTO adminDTO = convertUserEntityToDTO(admin);
+	    return adminDTO;
+	}
+	
+
+	@Override
+	public UserResponseDTO updateAdminProfile(UserDTO userDTO) {
+		String usernameOrEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+	    User admin = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
+	        .orElseThrow(() -> new UserException("Admin not found!"));
+	    
+	    admin.setFirstName(userDTO.getFirstName());
+	    admin.setLastName(userDTO.getLastName());
+	    admin.setUsername(userDTO.getUsername());
+	    admin.setEmail(userDTO.getEmail());
+	    admin.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+	    userRepository.save(admin);
+	    
+	    UserResponseDTO adminResponseDTO = convertUserEntityToDTO(admin);
+	    return adminResponseDTO;
+	}
+
+	
+	
+	
+	
+
+	private List<UserResponseDTO> convertUserListEntityToDTO(List<User> allUsers) {
+		return allUsers.stream()
+		        .map(this::convertUserEntityToDTO)
+		        .collect(Collectors.toList());
+	}
+
+	private UserResponseDTO convertUserEntityToDTO(User user) {
+		UserResponseDTO userDTO = new UserResponseDTO();
+	    userDTO.setId(user.getId());
+	    userDTO.setFirstName(user.getFirstName());
+	    userDTO.setLastName(user.getLastName());
+	    userDTO.setUsername(user.getUsername());
+	    userDTO.setEmail(user.getEmail());
+	    Set<String> roles = user.getRoles().stream()
+                .map(Role::getName)
+                .collect(Collectors.toSet());
+	    userDTO.setRoles(roles);
+	    if(user.getAccounts()!= null) {
+	    	List<AccountDTO> accountDTOs = user.getAccounts().stream()
+					.map(this::convertAccountToDTO)
+					.collect(Collectors.toList());
+			userDTO.setAccounts(accountDTOs);
+	    }
+		return userDTO;
+	}
+
+	private AccountDTO convertAccountToDTO(Account account) {
+		AccountDTO accountDTO = new AccountDTO();
+	    accountDTO.setAccountNumber(account.getAccountNumber());
+	    accountDTO.setAccountType(account.getAccountType());
+	    accountDTO.setBalance(account.getBalance());
+	    return accountDTO;
+	}
+	
+	
+	private List<TransactionDTO> convertTransactionListEntityToDTO(List<Transaction> allTransactions) {
+		return allTransactions.stream()
+	            .map(this::convertTransactionToDTO)
+	            .collect(Collectors.toList());
+	}
+
+	private TransactionDTO convertTransactionToDTO(Transaction transaction) {
+		TransactionDTO transactionDTO = new TransactionDTO();
+	    transactionDTO.setId(transaction.getId());
+	    transactionDTO.setSenderAccountNumber(transaction.getSenderAccountNumber());
+	    transactionDTO.setReceiverAccountNumber(transaction.getReceiverAccountNumber());
+	    transactionDTO.setTransactionType(transaction.getTransactionType());
+	    transactionDTO.setAmount(transaction.getAmount());
+	    transactionDTO.setTransactionDate(transaction.getTransactionDate());
+	    
+	    return transactionDTO;
+	}
+
+	
+	private User convertUserDTOToEntity(UserDTO userDTO) {
+		User user = new User();
+	    user.setFirstName(userDTO.getFirstName());
+	    user.setLastName(userDTO.getLastName());
+	    user.setUsername(userDTO.getUsername());
+	    user.setEmail(userDTO.getEmail());
+	    user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+	    Set<Role> roles = userDTO.getRoles().stream()
+                .map(roleName -> roleRepository.findByName("ROLE_" + roleName).orElseThrow(() -> new RuntimeException("Role not found: " + roleName)))
+                .collect(Collectors.toSet());
+	    user.setRoles(roles);
+	    if (userDTO.getAccounts() != null) {
+	        List<Account> accounts = convertDTOListToAccountEntity(userDTO.getAccounts());
+	        user.setAccounts(accounts);
+	    }
+	    return user;
+	}
+
+	private List<Account> convertDTOListToAccountEntity(List<AccountDTO> accountsDTO) {
+		return accountsDTO.stream()
+                .map(this::convertDTOToAccountEntity)
+                .collect(Collectors.toList());
+	}
+
+	private Account convertDTOToAccountEntity(AccountDTO accountDTO) {
+		Account account = new Account();
+	    account.setAccountNumber(accountDTO.getAccountNumber());
+	    account.setAccountType(accountDTO.getAccountType());
+	    account.setBalance(accountDTO.getBalance());
+	    return account;
+	}
+	
+}

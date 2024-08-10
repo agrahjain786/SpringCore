@@ -1,0 +1,10 @@
+package com.techlabs.app.service;
+
+import com.techlabs.app.dto.BlogDTO;
+import com.techlabs.app.util.PagedResponse;
+
+public interface BlogService {
+
+	PagedResponse<BlogDTO> getAllBlogs(int page, int size, String sortBy, String direction);
+
+}

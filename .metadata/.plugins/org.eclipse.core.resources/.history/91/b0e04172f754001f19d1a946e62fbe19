@@ -1,0 +1,31 @@
+package com.techlabs.app.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class RegisterDto {
+	
+	@NotBlank(message = "First name is Mandatory")
+	private String firstName;
+	
+	private String lastName;
+	
+	@NotBlank(message = "Username is Mandatory")
+	private String username;
+	
+	@NotBlank(message = "Email is Mandatory")
+	private String email;
+	
+	@NotBlank(message = "Password is Mandatory")
+	private String password;
+	
+	@NotBlank(message = "Role is Mandatory")
+	private String role;
+
+
+}

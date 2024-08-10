@@ -1,0 +1,271 @@
+package com.techlabs.app.service;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
+import com.techlabs.app.dto.BlogDTO;
+import com.techlabs.app.dto.CommentDTO;
+import com.techlabs.app.entity.Blog;
+import com.techlabs.app.entity.Comment;
+import com.techlabs.app.exception.BlogException;
+import com.techlabs.app.repository.BlogRepository;
+import com.techlabs.app.repository.CommentRepository;
+import com.techlabs.app.util.PagedResponse;
+
+
+
+@Service
+public class BlogServiceImpl implements BlogService{
+	
+	
+	private BlogRepository blogRepository;
+	
+	private CommentRepository commentRepository;
+
+	public BlogServiceImpl(BlogRepository blogRepository,CommentRepository commentRepository) {
+		super();
+		this.blogRepository = blogRepository;
+		this.commentRepository = commentRepository;
+	}
+
+
+	@Override
+	public PagedResponse<BlogDTO> getAllBlogs(int page, int size, String sortBy, String direction) {
+		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+		
+		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+		
+		Page<Blog> pages = blogRepository.findAll(pageable);
+		List<Blog> allBlogs = pages.getContent();
+		List<BlogDTO> allBlogsDTO = convertListToDTO(allBlogs);
+		
+		return new PagedResponse<BlogDTO>(allBlogsDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+	}
+
+	
+	@Override
+	public BlogDTO getBlogById(int blogId) {
+		
+		Blog blog = blogRepository.findById(blogId).orElse(null);
+		
+		if(blog == null) {
+			throw new BlogException("No Blog found with this id "+ blogId);
+		}
+		
+		return convertToBlogDTO(blog);
+		
+	}
+	
+	
+	@Override
+	public BlogDTO addBlog(BlogDTO blogDTO) {
+		blogDTO.setId(0);
+		if(blogDTO.isPublished() == true) blogDTO.setPublishedDate(LocalDateTime.now());
+		else blogDTO.setPublishedDate(null);
+		Blog blog = convertToBlogEntity(blogDTO);
+		Blog savedBlog = blogRepository.save(blog);
+		return convertToBlogDTO(savedBlog);
+	}
+	
+	
+
+	@Override
+	public BlogDTO updateBlog(BlogDTO blogDTO) {
+		BlogDTO dbBlog = getBlogById(blogDTO.getId());
+		if(blogDTO.isPublished() == true && dbBlog.isPublished() == false) blogDTO.setPublishedDate(LocalDateTime.now());
+		Blog blog = convertToBlogEntity(blogDTO);
+		Blog savedBlog = blogRepository.save(blog);
+		return convertToBlogDTO(savedBlog);
+	}
+
+	
+	
+	@Override
+	public void deleteBlog(int blogId) {
+		BlogDTO dbBlog = getBlogById(blogId);
+		Blog blog = convertToBlogEntity(dbBlog);
+		blogRepository.delete(blog);
+	}
+
+
+	@Override
+	public PagedResponse<BlogDTO> getAllPublishedBlogs(int page, int size, String sortBy, String direction) {
+		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+		
+		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+		
+		Page<Blog> pages = blogRepository.findByPublishedTrue(pageable);
+		List<Blog> allBlogs = pages.getContent();
+		List<BlogDTO> allBlogsDTO = convertListToDTO(allBlogs);
+		
+		return new PagedResponse<BlogDTO>(allBlogsDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+	}
+
+
+	
+
+	@Override
+	public PagedResponse<BlogDTO> getAllUnpublishedBlogs(int page, int size, String sortBy, String direction) {
+		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+		
+		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+		
+		Page<Blog> pages = blogRepository.findByPublishedFalse(pageable);
+		List<Blog> allBlogs = pages.getContent();
+		List<BlogDTO> allBlogsDTO = convertListToDTO(allBlogs);
+		
+		return new PagedResponse<BlogDTO>(allBlogsDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+	}
+	
+	
+
+	@Override
+	public BlogDTO makeBlogPublished(int blogId) {
+		BlogDTO blogDTO = getBlogById(blogId);
+		
+		if(blogDTO.isPublished() == true) {
+			throw new BlogException("Blog with ID "+ blogDTO.getId() + " is already published");
+		}
+		
+		blogDTO.setPublished(true);
+		blogDTO.setPublishedDate(LocalDateTime.now());
+		
+		Blog blog = convertToBlogEntity(blogDTO);
+		Blog savedBlog = blogRepository.save(blog);
+		return convertToBlogDTO(savedBlog);
+	}
+
+
+
+	@Override
+	public BlogDTO addCommentToPost(int id, CommentDTO commentDTO) {
+		BlogDTO blogDTO = getBlogById(id);
+		
+		if(!blogDTO.isPublished()) {
+			throw new BlogException("No such Blog Published");
+		}
+		
+		Blog blog = convertToBlogEntity(blogDTO);
+		Comment comment = convertToCommentEntity(commentDTO, blog);
+		blog.addComment(comment);
+		Blog savedBlog = blogRepository.save(blog);
+		return convertToBlogDTO(savedBlog);
+	}
+
+
+	
+
+	@Override
+	public BlogDTO deleteCommentToPost(int blogId, int commentId) {
+		BlogDTO blogDTO = getBlogById(blogId);
+		
+		if(!blogDTO.isPublished()) {
+			throw new BlogException("No such Blog Published");
+		}
+		
+		Comment comment = commentRepository.findById(commentId).orElse(null);
+
+		
+		if((comment == null) || (comment.getBlog().getId() != blogId)) {
+			throw new BlogException("No such Comment exists on this post with this id "+ commentId);
+		}
+		System.out.println(comment);
+		Blog blog = convertToBlogEntity(blogDTO);
+		blog.removeComment(comment);
+		commentRepository.delete(comment);
+	    return convertToBlogDTO(blog);
+	}
+
+
+	
+	
+	
+	
+	
+	
+	
+	
+
+	
+	private List<BlogDTO> convertListToDTO(List<Blog> allBlogs) {
+		List<BlogDTO> blogs = new ArrayList<>();
+		for(Blog b:allBlogs) {
+			blogs.add(convertToBlogDTO(b));
+		}
+		return blogs;
+	}
+	
+	
+	private BlogDTO convertToBlogDTO(Blog blog) {
+		BlogDTO blogDTO = new BlogDTO();
+		blogDTO.setId(blog.getId());
+	    blogDTO.setTitle(blog.getTitle());
+	    blogDTO.setCategory(blog.getCategory());
+	    blogDTO.setData(blog.getData());
+	    blogDTO.setPublishedDate(blog.getPublishedDate());
+	    blogDTO.setPublished(blog.isPublished());
+	    if(blog.getComments() != null) blogDTO.setComments(convertToListCommentDTO(blog.getComments()));
+        return blogDTO;
+    }
+	
+	
+	private List<CommentDTO> convertToListCommentDTO(List<Comment> comments) {
+		List<CommentDTO> allComments = new ArrayList<>();
+		for(Comment c:comments) {
+			allComments.add(convertToCommentDTO(c));
+		}
+		return allComments;
+	}
+	
+	
+	private CommentDTO convertToCommentDTO(Comment comment) {
+		CommentDTO commentDTO = new CommentDTO();
+		commentDTO.setId(comment.getId());
+		commentDTO.setDescription(comment.getDescription());
+		return commentDTO;
+	}
+	
+	
+	private Blog convertToBlogEntity(BlogDTO blogDTO) {
+		Blog blog = new Blog();
+	    blog.setId(blogDTO.getId());
+	    blog.setTitle(blogDTO.getTitle());
+	    blog.setCategory(blogDTO.getCategory());
+	    blog.setData(blogDTO.getData());
+	    blog.setPublishedDate(blogDTO.getPublishedDate());
+	    blog.setPublished(blogDTO.isPublished());
+	    if(blogDTO.getComments() != null)blog.setComments(convertToListCommentEntity(blogDTO.getComments(),blog));
+	    return blog;
+	}
+	
+	
+	
+	private List<Comment> convertToListCommentEntity(List<CommentDTO> allCommentsDTO, Blog blog) {
+		List<Comment> allComments = new ArrayList<>();
+		for(CommentDTO c:allCommentsDTO) {
+			allComments.add(convertToCommentEntity(c, blog));
+		}
+		return allComments;
+	}
+
+	
+	private Comment convertToCommentEntity(CommentDTO commentDTO, Blog blog) {
+		Comment comment = new Comment();
+		comment.setId(commentDTO.getId());
+		comment.setDescription(commentDTO.getDescription());
+		comment.setBlog(blog);
+		return comment;
+	}
+
+
+
+
+
+}

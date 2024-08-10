@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Copy element &apos;Email.java&apos; to &apos;11-spring-jpa-bank-application/src/main/java/com.techlabs.app.entity&apos;&#x0A;- Original project: &apos;06-spring-email&apos;&#x0A;- Destination element: &apos;11-spring-jpa-bank-application/src/main/java/com.techlabs.app.entity&apos;&#x0A;- Original element: &apos;com.techlabs.app.entity.Email.java&apos;" description="Copy compilation unit" destination="=11-spring-jpa-bank-application/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.techlabs.app.entity" element1="/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.techlabs.app.entity{Email.java" files="0" flags="589830" folders="0" id="org.eclipse.jdt.ui.copy" policy="org.eclipse.jdt.ui.copyResources" stamp="1723157370414" units="1" version="1.0"/>
+</session>

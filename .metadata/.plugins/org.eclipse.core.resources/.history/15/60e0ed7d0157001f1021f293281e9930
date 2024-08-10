@@ -1,0 +1,40 @@
+package com.techlabs.app.repository;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.techlabs.app.entity.Account;
+import com.techlabs.app.entity.Transaction;
+
+@Repository
+public interface TransactionRepository extends JpaRepository<Transaction, Integer> {
+
+	Page<Transaction> findByTransactionDateBetween(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
+
+	Page<Transaction> findBySenderAccountNumberOrReceiverAccountNumber(int senderAccountNumber, int receiverAccountNumber, Pageable pageable);
+
+	Page<Transaction> findBySenderAccountNumberInOrReceiverAccountNumberIn(List<Integer> accountNumbers,
+			List<Integer> accountNumbers2, Pageable pageable);
+
+	Page<Transaction> findBySenderAccountNumberInOrReceiverAccountNumberInAndTransactionDateBetween(
+			List<Integer> accountNumbers, List<Integer> accountNumbers2, LocalDateTime startDate, LocalDateTime endDate,
+			Pageable pageable);
+
+	boolean existsBySenderAccountNumberAndTransactionDateAfter(int accountNumber, LocalDateTime oneYearAgo);
+
+	boolean existsBySenderAccountNumberOrReceiverAccountNumberAndTransactionDateAfter(int accountNumber,
+			int accountNumber2, LocalDateTime oneYearAgo);
+
+	List<Transaction> findBySenderAccountNumberInOrReceiverAccountNumberIn(List<Integer> accountNumbers,
+			List<Integer> accountNumbers2);
+
+	List<Transaction> findBySenderAccountNumberInOrReceiverAccountNumberInAndTransactionDateBetween(
+			List<Integer> accountNumbers, List<Integer> accountNumbers2, LocalDateTime startDate,
+			LocalDateTime endDate);
+
+}

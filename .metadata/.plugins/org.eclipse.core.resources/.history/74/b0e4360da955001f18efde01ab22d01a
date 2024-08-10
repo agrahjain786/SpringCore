@@ -1,0 +1,65 @@
+package com.techlabs.app.service;
+
+import java.time.LocalDateTime;
+
+import org.springframework.stereotype.Service;
+
+import com.techlabs.app.dto.TransactionDTO;
+import com.techlabs.app.dto.UserDTO;
+import com.techlabs.app.repository.AccountRepository;
+import com.techlabs.app.repository.TransactionRepository;
+import com.techlabs.app.repository.UserRepository;
+import com.techlabs.app.util.PagedResponse;
+
+@Service
+public class CustomerServiceImpl implements CustomerService{
+	
+	private AccountRepository accountRepository;
+	
+	private TransactionRepository transactionRepository;
+	
+	private UserRepository userRepository;
+
+	public CustomerServiceImpl(AccountRepository accountRepository, TransactionRepository transactionRepository,
+			UserRepository userRepository) {
+		super();
+		this.accountRepository = accountRepository;
+		this.transactionRepository = transactionRepository;
+		this.userRepository = userRepository;
+	}
+
+	@Override
+	public PagedResponse<TransactionDTO> getAllUsersTransactions(int page, int size, String sortBy, String direction) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public PagedResponse<TransactionDTO> getAllUsersTransactionsByDate(int page, int size, String sortBy,
+			String direction, LocalDateTime startDate, LocalDateTime endDate) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public UserDTO getUserProfile() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public UserDTO getUserProfileUpdate(UserDTO userDTO) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public TransactionDTO generateTransaction(TransactionDTO transactionDTO) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+//	Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//  UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+}

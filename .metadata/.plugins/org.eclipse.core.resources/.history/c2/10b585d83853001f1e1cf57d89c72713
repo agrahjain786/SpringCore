@@ -1,0 +1,107 @@
+package com.techlabs.app.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.techlabs.app.entity.Course;
+import com.techlabs.app.entity.Student;
+import com.techlabs.app.repository.CourseRepository;
+import com.techlabs.app.repository.StudentRepository;
+
+
+@Service
+public class StudentServiceImpl implements StudentService{
+	
+
+	private StudentRepository studentRepository;
+	
+
+	private CourseRepository courseRepository;
+
+	public StudentServiceImpl(StudentRepository studentRepository, CourseRepository courseRepository) {
+		super();
+		this.studentRepository = studentRepository;
+		this.courseRepository = courseRepository;
+	}
+
+	@Override
+	public Course createCourse(Course course) {
+		course.setId((long) 0);
+		return courseRepository.save(course);
+	}
+
+	@Override
+	public List<Course> getAllCourses() {
+		return courseRepository.findAll();
+	}
+
+	@Override
+	public Course getCourseById(Long id) {
+		return courseRepository.findById(id).orElse(null);
+		
+	}
+
+	@Override
+	public void deleteCourse(Long id) {
+		Course course = courseRepository.findById(id).orElse(null);
+		if(course != null) courseRepository.delete(course);
+		
+	}
+
+	@Override
+	public Student createStudent(Student student) {
+		student.setId((long) 0);
+		return studentRepository.save(student);
+	}
+
+	@Override
+	public List<Student> getAllStudents() {
+		return studentRepository.findAll();
+	}
+
+	@Override
+	public Student getStudentById(Long id) {
+		return studentRepository.findById(id).orElse(null);
+	}
+
+	@Override
+	public void deleteStudent(Long id) {
+		Student student = studentRepository.findById(id).orElse(null);
+		if(student != null) studentRepository.delete(student);
+		
+	}
+
+	@Override
+	public Student addCourseToStudent(Long studentId, Long courseId) {
+		Student student = studentRepository.findById(studentId).orElse(null);
+		if(student != null) {
+			Course course = courseRepository.findById(courseId).orElse(null);
+			if(course != null) {
+				student.getCourses().add(course);
+				course.getStudents().add(student);
+				return studentRepository.save(student);
+			}
+		}
+        return null;
+        
+	}
+
+	@Override
+	public Student removeCourseFromStudent(Long studentId, Long courseId) {
+		Student student = studentRepository.findById(studentId).orElse(null);
+		if(student != null) {
+			Course course = courseRepository.findById(courseId).orElse(null);
+			if(course != null) {
+				student.getCourses().remove(course);
+				return studentRepository.save(student);
+			}
+		}
+        return null;
+	}
+	
+	
+	
+
+}

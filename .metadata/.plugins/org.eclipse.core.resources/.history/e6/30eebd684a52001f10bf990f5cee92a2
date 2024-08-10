@@ -1,0 +1,10 @@
+package com.techlabs.app;
+
+public class Snippet {
+	public static void main(String[] args) {
+		import lombok.AllArgsConstructor;
+		import lombok.Data;
+		import lombok.NoArgsConstructor;
+	}
+}
+
