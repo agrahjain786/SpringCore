@@ -1,0 +1,24 @@
+package com.techlabs.app.service;
+
+import com.techlabs.app.dto.ContactDTO;
+import com.techlabs.app.dto.ContactDetailsDTO;
+import com.techlabs.app.util.PagedResponse;
+
+import jakarta.validation.Valid;
+
+
+public interface StaffService {
+
+	ContactDTO createContact(ContactDTO contactDTO);
+
+	PagedResponse<ContactDTO> getAllContacts(int page, int size, String sortBy, String direction);
+
+	ContactDTO getContactById(int id);
+
+	ContactDTO updateContact(int id,ContactDTO contactDTO);
+
+	void deleteContact(int id);
+
+	ContactDTO createContactDetail(int contactId,ContactDetailsDTO contactDetailDTO);
+
+}

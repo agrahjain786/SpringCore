@@ -1,0 +1,122 @@
+package com.techlabs.app.service;
+
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
+import com.techlabs.app.dto.ContactDTO;
+import com.techlabs.app.dto.ContactDetailsDTO;
+import com.techlabs.app.dto.UserResponseDTO;
+import com.techlabs.app.entity.Contact;
+import com.techlabs.app.entity.User;
+import com.techlabs.app.exception.UserException;
+import com.techlabs.app.repository.ContactRepository;
+import com.techlabs.app.repository.UserRepository;
+import com.techlabs.app.util.PagedResponse;
+
+@Service
+public class StaffServiceImpl implements StaffService{
+	
+	private ContactRepository contactRepository;
+	
+	private UserRepository userRepository;
+
+	public StaffServiceImpl(ContactRepository contactRepository, UserRepository userRepository) {
+		super();
+		this.contactRepository = contactRepository;
+		this.userRepository = userRepository;
+	}
+
+	@Override
+	public ContactDTO createContact(ContactDTO contactDTO) {
+		
+		String usernameOrEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+	    User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
+	            .orElseThrow(() -> new UserException("User not found with username or email: " + usernameOrEmail));
+		
+		Contact contact = convertContactDTOToEntity(contactDTO);
+		contact.setUser(user);
+        Contact savedContact = contactRepository.save(contact);
+        return convertContactEntityToDTO(savedContact);
+	}
+
+	@Override
+	public PagedResponse<ContactDTO> getAllContacts(int page, int size, String sortBy, String direction) {
+		String usernameOrEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+	    User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
+	            .orElseThrow(() -> new UserException("User not found with username or email: " + usernameOrEmail));
+	    
+		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+		
+		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+		
+		Page<Contact> pages = contactRepository.findByUser(user, pageable);
+		List<Contact> allContacts = pages.getContent();
+		List<ContactDTO> allContactsDTO = convertContactListToDTO(allContacts);
+		
+		return new PagedResponse<ContactDTO>(allContactsDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+	}
+
+	@Override
+	public ContactDTO getContactById(int id) {
+		String usernameOrEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+	    User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
+	            .orElseThrow(() -> new UserException("User not found with username or email: " + usernameOrEmail));
+	    
+	    Contact contact = contactRepository.findById(id).orElseThrow(()->new ContactException("No contact found with this id"));
+	    
+	    return convertContactEntityToDTO(contact);
+	}
+
+	@Override
+	public ContactDTO updateContact(int id, ContactDTO contactDTO) {
+		String usernameOrEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+	    User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
+	            .orElseThrow(() -> new UserException("User not found with username or email: " + usernameOrEmail));
+	    
+	    Contact contact = 
+	}
+
+	@Override
+	public void deleteContact(int id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public ContactDTO createContactDetail(int contactId, ContactDetailsDTO contactDetailDTO) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public PagedResponse<ContactDetailsDTO> getAllContactDetails(int contactId, int page, int size, String sortBy,
+			String direction) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ContactDetailsDTO getContactDetailById(int id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ContactDTO updateContactDetail(int id, ContactDetailsDTO contactDetailDTO) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void deleteContactDetail(int id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+}

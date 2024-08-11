@@ -1,0 +1,42 @@
+package com.techlabs.app.service;
+
+import org.springframework.stereotype.Service;
+
+import com.techlabs.app.dto.UserDTO;
+import com.techlabs.app.dto.UserResponseDTO;
+import com.techlabs.app.util.PagedResponse;
+
+@Service
+public class AdminServiceImpl implements AdminService{
+
+	@Override
+	public UserResponseDTO createUser(UserDTO userDTO) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public PagedResponse<UserResponseDTO> getAllUsers(int page, int size, String sortBy, String direction) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public UserResponseDTO getUserById(int id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public UserResponseDTO updateUser(int id, UserDTO userDTO) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void deleteUser(int id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+}

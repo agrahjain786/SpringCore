@@ -1,0 +1,73 @@
+package com.techlabs.app.service;
+
+import org.springframework.stereotype.Service;
+
+import com.techlabs.app.dto.ContactDTO;
+import com.techlabs.app.dto.ContactDetailsDTO;
+import com.techlabs.app.util.PagedResponse;
+
+@Service
+public class StaffServiceImpl implements StaffService{
+
+	@Override
+	public ContactDTO createContact(ContactDTO contactDTO) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public PagedResponse<ContactDTO> getAllContacts(int page, int size, String sortBy, String direction) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ContactDTO getContactById(int id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ContactDTO updateContact(int id, ContactDTO contactDTO) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void deleteContact(int id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public ContactDTO createContactDetail(int contactId, ContactDetailsDTO contactDetailDTO) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public PagedResponse<ContactDetailsDTO> getAllContactDetails(int contactId, int page, int size, String sortBy,
+			String direction) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ContactDetailsDTO getContactDetailById(int id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ContactDTO updateContactDetail(int id, ContactDetailsDTO contactDetailDTO) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void deleteContactDetail(int id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+}
