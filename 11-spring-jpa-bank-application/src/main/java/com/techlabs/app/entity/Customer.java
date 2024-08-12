@@ -42,7 +42,6 @@ public class Customer{
     private List<Account> accounts;
     
     
-    
     @OneToOne
     @MapsId
     @JoinColumn(name="id")

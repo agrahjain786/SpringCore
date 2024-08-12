@@ -279,6 +279,7 @@ public class AdminController {
 		return new ResponseEntity<String>("Total " + countOfActivateAccounts + " accounts made active as per the request made.",HttpStatus.OK);
 	}
 	
+	
 	@Operation(summary = "By Admin: Make the All the customers Activate who have made request")
 	@PutMapping("/activate/requests/customer")
 	public ResponseEntity<String> activateCustomersFromRequests() {

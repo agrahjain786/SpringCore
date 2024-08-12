@@ -29,8 +29,8 @@ public class AuthController {
     }
 
     // Build Login REST API
-    @Operation(summary = "By Anyone: Login the user or admin if have registered")
-    @PostMapping(value = {"/login", "/signin"})
+    @Operation(summary = "By Anyone: Login the user or admin if have registered and if active")
+    @PostMapping(value = {"/login"})
     public ResponseEntity<JWTAuthResponse> login(@RequestBody LoginDTO loginDto){
         String token = authService.login(loginDto);
         System.out.println(loginDto);
@@ -42,7 +42,7 @@ public class AuthController {
 
     // Build Register REST API
     @Operation(summary = "By Anyone: Register for the role of customer and upload the files for verification")
-    @PostMapping(value = {"/register", "/signup"})
+    @PostMapping(value = {"/register"})
     public ResponseEntity<String> register(@ModelAttribute UserDTO userDto, @RequestParam("file1") MultipartFile file1, @RequestParam("file2") MultipartFile file2){
         String response = authService.register(userDto, file1, file2);
         return new ResponseEntity<>(response, HttpStatus.CREATED);

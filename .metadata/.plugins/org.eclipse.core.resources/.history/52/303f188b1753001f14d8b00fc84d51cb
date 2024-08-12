@@ -1,7 +1,0 @@
-package com.techlabs.app.repository;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-
-public class CourseRepository implements JpaRepository<T, ID> {
-
-}

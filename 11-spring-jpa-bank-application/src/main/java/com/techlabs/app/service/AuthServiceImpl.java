@@ -72,13 +72,13 @@ public class AuthServiceImpl implements AuthService {
         String usernameOrEmail = SecurityContextHolder.getContext().getAuthentication().getName();
 	    User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
 	            .orElseThrow(() -> new UserException("User not found with username or email: " + usernameOrEmail));
-        
-//        User user = (User) authentication.getPrincipal();
+	    
+	    
         
         if (user.getCustomer() != null && !user.getCustomer().isActive()) {
             throw new UserException("Your account is inactive. Please contact Admin to make it active.");
         }
-
+        
         String token = jwtTokenProvider.generateToken(authentication);
 
         return token;

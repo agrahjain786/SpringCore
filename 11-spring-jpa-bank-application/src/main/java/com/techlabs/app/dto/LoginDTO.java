@@ -16,7 +16,4 @@ public class LoginDTO {
 	@NotBlank(message = "Password is Mandatory")
 	private String password;
 	
-	@NotBlank(message = "Role is Mandatory")
-	private String role;
-
 }
