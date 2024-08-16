@@ -1,7 +1,0 @@
-package com.techlabs.app.service;
-
-public interface EmailService {
-
-	void sendSimpleMail(String email);
-
-}

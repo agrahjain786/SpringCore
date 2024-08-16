@@ -5787,3 +5787,489 @@ END
 
 !ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-12 14:48:24.580
 !MESSAGE Boot project ADDED: 12-spring-jpa-contact-management
+!SESSION 2024-08-12 19:33:24.521 -----------------------------------------------
+eclipse.buildId=4.23.1.202406150140
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=macosx, ARCH=aarch64, WS=cocoa, NL=en_IN
+Framework arguments:  -product org.springframework.boot.ide.branding.sts4 -keyring /Users/abhijain/.eclipse_keyring
+Command-line arguments:  -os macosx -ws cocoa -arch aarch64 -product org.springframework.boot.ide.branding.sts4 -keyring /Users/abhijain/.eclipse_keyring
+
+!ENTRY ch.qos.logback.classic 1 0 2024-08-12 19:33:25.654
+!MESSAGE Activated before the state location was initialized. Retry after the state location is initialized.
+
+!ENTRY ch.qos.logback.classic 1 0 2024-08-12 19:33:29.026
+!MESSAGE Logback config file: /Users/abhijain/SpringCore/.metadata/.plugins/org.eclipse.m2e.logback/logback.2.6.1.20240411-1122.xml
+
+!ENTRY org.eclipse.ui 2 0 2024-08-12 19:33:29.212
+!MESSAGE Warnings while parsing the commands from the 'org.eclipse.ui.commands' and 'org.eclipse.ui.actionDefinitions' extension points.
+!SUBENTRY 1 org.eclipse.ui 2 0 2024-08-12 19:33:29.212
+!MESSAGE Commands should really have a category: plug-in='org.springframework.tooling.boot.ls', id='spring.initializr.addStarters', categoryId='org.eclipse.lsp4e.commandCategory'
+
+!ENTRY org.eclipse.ui 2 0 2024-08-12 19:33:29.392
+!MESSAGE Warnings while parsing the commands from the 'org.eclipse.ui.commands' and 'org.eclipse.ui.actionDefinitions' extension points.
+!SUBENTRY 1 org.eclipse.ui 2 0 2024-08-12 19:33:29.392
+!MESSAGE Commands should really have a category: plug-in='org.springframework.tooling.boot.ls', id='spring.initializr.addStarters', categoryId='org.eclipse.lsp4e.commandCategory'
+
+!ENTRY org.springframework.tooling.ls.eclipse.commons 1 0 2024-08-12 19:33:31.621
+!MESSAGE Command list starting LS: org.springframework.tooling.boot.ls
+START:
+/Applications/SpringToolSuite4.app/Contents/Eclipse/plugins/org.eclipse.justj.openjdk.hotspot.jre.full.macosx.aarch64_21.0.3.v20240426-1530/jre/bin/java
+-cp
+/Applications/SpringToolSuite4.app/Contents/Eclipse/plugins/org.springframework.tooling.boot.ls_1.55.1.202406141939/servers/spring-boot-language-server/BOOT-INF/classes:/Applications/SpringToolSuite4.app/Contents/Eclipse/plugins/org.springframework.tooling.boot.ls_1.55.1.202406141939/servers/spring-boot-language-server/BOOT-INF/lib/*
+-Dsts.lsp.client=eclipse
+-Xmx1024m
+-XX:TieredStopAtLevel=1
+-Xlog:jni+resolve=off
+-Dspring.config.location=file:/Applications/SpringToolSuite4.app/Contents/Eclipse/plugins/org.springframework.tooling.boot.ls_1.55.1.202406141939/servers/spring-boot-language-server/BOOT-INF/classes/application.properties
+-XX:ErrorFile=/Users/abhijain/SpringCore/.metadata/.plugins/org.springframework.tooling.boot.ls/fatal-error-spring-boot_1723471411620
+org.springframework.ide.vscode.boot.app.BootLanguageServerBootApp
+--languageserver.hover-timeout=225
+END
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-12 19:33:31.621
+!MESSAGE DelegatingStreamConnectionProvider - Starting Boot LS
+
+!ENTRY org.springframework.tooling.ls.eclipse.commons 1 0 2024-08-12 19:33:31.627
+!MESSAGE Started org.springframework.tooling.boot.ls LS process 10708
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-12 19:33:32.437
+!MESSAGE Boot project ADDED: 01-spring-security
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-12 19:33:32.437
+!MESSAGE Starting Boot LS...
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-12 19:33:32.439
+!MESSAGE Started Boot LS process
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-12 19:33:32.439
+!MESSAGE Boot project ADDED: 01-springcore-dependency-inversion
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-12 19:33:32.440
+!MESSAGE Boot project ADDED: 02-spring-hibernate
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-12 19:33:32.440
+!MESSAGE Boot project ADDED: 03-spring-rest-hibernate
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-12 19:33:32.440
+!MESSAGE Boot project ADDED: 04-spring-rest-jpa
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-12 19:33:32.440
+!MESSAGE Boot project ADDED: 05-spring-rest-jpa-employee
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-12 19:33:32.440
+!MESSAGE Boot project ADDED: 06-spring-email
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-12 19:33:32.440
+!MESSAGE Boot project ADDED: 07-spring-jpa-one-to-one
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-12 19:33:32.441
+!MESSAGE Boot project ADDED: 08-spring-jpa-one-to-many
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-12 19:33:32.441
+!MESSAGE Boot project ADDED: 09-spring-jpa-blog-comment
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-12 19:33:32.442
+!MESSAGE Boot project ADDED: 10-spring-jpa-many-to-many
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-12 19:33:32.443
+!MESSAGE Boot project ADDED: 11-spring-jpa-bank-application
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-12 19:33:32.443
+!MESSAGE Boot project ADDED: 12-spring-jpa-contact-management
+!SESSION 2024-08-12 23:58:16.685 -----------------------------------------------
+eclipse.buildId=4.23.1.202406150140
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=macosx, ARCH=aarch64, WS=cocoa, NL=en_IN
+Framework arguments:  -product org.springframework.boot.ide.branding.sts4 -keyring /Users/abhijain/.eclipse_keyring
+Command-line arguments:  -os macosx -ws cocoa -arch aarch64 -product org.springframework.boot.ide.branding.sts4 -keyring /Users/abhijain/.eclipse_keyring
+
+!ENTRY ch.qos.logback.classic 1 0 2024-08-12 23:58:18.048
+!MESSAGE Activated before the state location was initialized. Retry after the state location is initialized.
+
+!ENTRY ch.qos.logback.classic 1 0 2024-08-12 23:58:20.459
+!MESSAGE Logback config file: /Users/abhijain/SpringCore/.metadata/.plugins/org.eclipse.m2e.logback/logback.2.6.1.20240411-1122.xml
+
+!ENTRY org.eclipse.ui 2 0 2024-08-12 23:58:20.625
+!MESSAGE Warnings while parsing the commands from the 'org.eclipse.ui.commands' and 'org.eclipse.ui.actionDefinitions' extension points.
+!SUBENTRY 1 org.eclipse.ui 2 0 2024-08-12 23:58:20.625
+!MESSAGE Commands should really have a category: plug-in='org.springframework.tooling.boot.ls', id='spring.initializr.addStarters', categoryId='org.eclipse.lsp4e.commandCategory'
+
+!ENTRY org.eclipse.ui 2 0 2024-08-12 23:58:20.811
+!MESSAGE Warnings while parsing the commands from the 'org.eclipse.ui.commands' and 'org.eclipse.ui.actionDefinitions' extension points.
+!SUBENTRY 1 org.eclipse.ui 2 0 2024-08-12 23:58:20.811
+!MESSAGE Commands should really have a category: plug-in='org.springframework.tooling.boot.ls', id='spring.initializr.addStarters', categoryId='org.eclipse.lsp4e.commandCategory'
+
+!ENTRY org.springframework.tooling.ls.eclipse.commons 1 0 2024-08-12 23:58:23.164
+!MESSAGE Command list starting LS: org.springframework.tooling.boot.ls
+START:
+/Applications/SpringToolSuite4.app/Contents/Eclipse/plugins/org.eclipse.justj.openjdk.hotspot.jre.full.macosx.aarch64_21.0.3.v20240426-1530/jre/bin/java
+-cp
+/Applications/SpringToolSuite4.app/Contents/Eclipse/plugins/org.springframework.tooling.boot.ls_1.55.1.202406141939/servers/spring-boot-language-server/BOOT-INF/classes:/Applications/SpringToolSuite4.app/Contents/Eclipse/plugins/org.springframework.tooling.boot.ls_1.55.1.202406141939/servers/spring-boot-language-server/BOOT-INF/lib/*
+-Dsts.lsp.client=eclipse
+-Xmx1024m
+-XX:TieredStopAtLevel=1
+-Xlog:jni+resolve=off
+-Dspring.config.location=file:/Applications/SpringToolSuite4.app/Contents/Eclipse/plugins/org.springframework.tooling.boot.ls_1.55.1.202406141939/servers/spring-boot-language-server/BOOT-INF/classes/application.properties
+-XX:ErrorFile=/Users/abhijain/SpringCore/.metadata/.plugins/org.springframework.tooling.boot.ls/fatal-error-spring-boot_1723487303163
+org.springframework.ide.vscode.boot.app.BootLanguageServerBootApp
+--languageserver.hover-timeout=225
+END
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-12 23:58:23.164
+!MESSAGE DelegatingStreamConnectionProvider - Starting Boot LS
+
+!ENTRY org.springframework.tooling.ls.eclipse.commons 1 0 2024-08-12 23:58:23.167
+!MESSAGE Started org.springframework.tooling.boot.ls LS process 11134
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-12 23:58:24.108
+!MESSAGE Boot project ADDED: 01-spring-security
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-12 23:58:24.108
+!MESSAGE Starting Boot LS...
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-12 23:58:24.110
+!MESSAGE Started Boot LS process
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-12 23:58:24.111
+!MESSAGE Boot project ADDED: 01-springcore-dependency-inversion
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-12 23:58:24.111
+!MESSAGE Boot project ADDED: 02-spring-hibernate
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-12 23:58:24.111
+!MESSAGE Boot project ADDED: 03-spring-rest-hibernate
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-12 23:58:24.111
+!MESSAGE Boot project ADDED: 04-spring-rest-jpa
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-12 23:58:24.113
+!MESSAGE Boot project ADDED: 05-spring-rest-jpa-employee
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-12 23:58:24.114
+!MESSAGE Boot project ADDED: 06-spring-email
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-12 23:58:24.116
+!MESSAGE Boot project ADDED: 07-spring-jpa-one-to-one
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-12 23:58:24.118
+!MESSAGE Boot project ADDED: 08-spring-jpa-one-to-many
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-12 23:58:24.119
+!MESSAGE Boot project ADDED: 09-spring-jpa-blog-comment
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-12 23:58:24.119
+!MESSAGE Boot project ADDED: 10-spring-jpa-many-to-many
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-12 23:58:24.120
+!MESSAGE Boot project ADDED: 11-spring-jpa-bank-application
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-12 23:58:24.122
+!MESSAGE Boot project ADDED: 12-spring-jpa-contact-management
+!SESSION 2024-08-13 12:38:19.776 -----------------------------------------------
+eclipse.buildId=4.23.1.202406150140
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=macosx, ARCH=aarch64, WS=cocoa, NL=en_IN
+Framework arguments:  -product org.springframework.boot.ide.branding.sts4 -keyring /Users/abhijain/.eclipse_keyring
+Command-line arguments:  -os macosx -ws cocoa -arch aarch64 -product org.springframework.boot.ide.branding.sts4 -keyring /Users/abhijain/.eclipse_keyring
+
+!ENTRY ch.qos.logback.classic 1 0 2024-08-13 12:38:20.920
+!MESSAGE Activated before the state location was initialized. Retry after the state location is initialized.
+
+!ENTRY ch.qos.logback.classic 1 0 2024-08-13 12:38:24.111
+!MESSAGE Logback config file: /Users/abhijain/SpringCore/.metadata/.plugins/org.eclipse.m2e.logback/logback.2.6.1.20240411-1122.xml
+
+!ENTRY org.eclipse.ui 2 0 2024-08-13 12:38:24.284
+!MESSAGE Warnings while parsing the commands from the 'org.eclipse.ui.commands' and 'org.eclipse.ui.actionDefinitions' extension points.
+!SUBENTRY 1 org.eclipse.ui 2 0 2024-08-13 12:38:24.284
+!MESSAGE Commands should really have a category: plug-in='org.springframework.tooling.boot.ls', id='spring.initializr.addStarters', categoryId='org.eclipse.lsp4e.commandCategory'
+
+!ENTRY org.eclipse.ui 2 0 2024-08-13 12:38:24.477
+!MESSAGE Warnings while parsing the commands from the 'org.eclipse.ui.commands' and 'org.eclipse.ui.actionDefinitions' extension points.
+!SUBENTRY 1 org.eclipse.ui 2 0 2024-08-13 12:38:24.477
+!MESSAGE Commands should really have a category: plug-in='org.springframework.tooling.boot.ls', id='spring.initializr.addStarters', categoryId='org.eclipse.lsp4e.commandCategory'
+
+!ENTRY org.springframework.tooling.ls.eclipse.commons 1 0 2024-08-13 12:38:26.785
+!MESSAGE Command list starting LS: org.springframework.tooling.boot.ls
+START:
+/Applications/SpringToolSuite4.app/Contents/Eclipse/plugins/org.eclipse.justj.openjdk.hotspot.jre.full.macosx.aarch64_21.0.3.v20240426-1530/jre/bin/java
+-cp
+/Applications/SpringToolSuite4.app/Contents/Eclipse/plugins/org.springframework.tooling.boot.ls_1.55.1.202406141939/servers/spring-boot-language-server/BOOT-INF/classes:/Applications/SpringToolSuite4.app/Contents/Eclipse/plugins/org.springframework.tooling.boot.ls_1.55.1.202406141939/servers/spring-boot-language-server/BOOT-INF/lib/*
+-Dsts.lsp.client=eclipse
+-Xmx1024m
+-XX:TieredStopAtLevel=1
+-Xlog:jni+resolve=off
+-Dspring.config.location=file:/Applications/SpringToolSuite4.app/Contents/Eclipse/plugins/org.springframework.tooling.boot.ls_1.55.1.202406141939/servers/spring-boot-language-server/BOOT-INF/classes/application.properties
+-XX:ErrorFile=/Users/abhijain/SpringCore/.metadata/.plugins/org.springframework.tooling.boot.ls/fatal-error-spring-boot_1723532906785
+org.springframework.ide.vscode.boot.app.BootLanguageServerBootApp
+--languageserver.hover-timeout=225
+END
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-13 12:38:26.785
+!MESSAGE DelegatingStreamConnectionProvider - Starting Boot LS
+
+!ENTRY org.springframework.tooling.ls.eclipse.commons 1 0 2024-08-13 12:38:26.792
+!MESSAGE Started org.springframework.tooling.boot.ls LS process 19077
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-13 12:38:27.601
+!MESSAGE Boot project ADDED: 01-spring-security
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-13 12:38:27.601
+!MESSAGE Starting Boot LS...
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-13 12:38:27.602
+!MESSAGE Started Boot LS process
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-13 12:38:27.602
+!MESSAGE Boot project ADDED: 01-springcore-dependency-inversion
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-13 12:38:27.602
+!MESSAGE Boot project ADDED: 02-spring-hibernate
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-13 12:38:27.602
+!MESSAGE Boot project ADDED: 03-spring-rest-hibernate
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-13 12:38:27.602
+!MESSAGE Boot project ADDED: 04-spring-rest-jpa
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-13 12:38:27.602
+!MESSAGE Boot project ADDED: 05-spring-rest-jpa-employee
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-13 12:38:27.602
+!MESSAGE Boot project ADDED: 06-spring-email
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-13 12:38:27.603
+!MESSAGE Boot project ADDED: 07-spring-jpa-one-to-one
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-13 12:38:27.603
+!MESSAGE Boot project ADDED: 08-spring-jpa-one-to-many
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-13 12:38:27.603
+!MESSAGE Boot project ADDED: 09-spring-jpa-blog-comment
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-13 12:38:27.603
+!MESSAGE Boot project ADDED: 10-spring-jpa-many-to-many
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-13 12:38:27.603
+!MESSAGE Boot project ADDED: 11-spring-jpa-bank-application
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-13 12:38:27.604
+!MESSAGE Boot project ADDED: 12-spring-jpa-contact-management
+!SESSION 2024-08-13 16:30:56.180 -----------------------------------------------
+eclipse.buildId=4.23.1.202406150140
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=macosx, ARCH=aarch64, WS=cocoa, NL=en_IN
+Framework arguments:  -product org.springframework.boot.ide.branding.sts4 -keyring /Users/abhijain/.eclipse_keyring
+Command-line arguments:  -os macosx -ws cocoa -arch aarch64 -product org.springframework.boot.ide.branding.sts4 -keyring /Users/abhijain/.eclipse_keyring
+
+!ENTRY ch.qos.logback.classic 1 0 2024-08-13 16:30:57.555
+!MESSAGE Activated before the state location was initialized. Retry after the state location is initialized.
+
+!ENTRY ch.qos.logback.classic 1 0 2024-08-13 16:31:02.362
+!MESSAGE Logback config file: /Users/abhijain/SpringCore/.metadata/.plugins/org.eclipse.m2e.logback/logback.2.6.1.20240411-1122.xml
+
+!ENTRY org.eclipse.ui 2 0 2024-08-13 16:31:02.548
+!MESSAGE Warnings while parsing the commands from the 'org.eclipse.ui.commands' and 'org.eclipse.ui.actionDefinitions' extension points.
+!SUBENTRY 1 org.eclipse.ui 2 0 2024-08-13 16:31:02.548
+!MESSAGE Commands should really have a category: plug-in='org.springframework.tooling.boot.ls', id='spring.initializr.addStarters', categoryId='org.eclipse.lsp4e.commandCategory'
+
+!ENTRY org.eclipse.ui 2 0 2024-08-13 16:31:02.733
+!MESSAGE Warnings while parsing the commands from the 'org.eclipse.ui.commands' and 'org.eclipse.ui.actionDefinitions' extension points.
+!SUBENTRY 1 org.eclipse.ui 2 0 2024-08-13 16:31:02.733
+!MESSAGE Commands should really have a category: plug-in='org.springframework.tooling.boot.ls', id='spring.initializr.addStarters', categoryId='org.eclipse.lsp4e.commandCategory'
+
+!ENTRY org.springframework.tooling.ls.eclipse.commons 1 0 2024-08-13 16:31:04.983
+!MESSAGE Command list starting LS: org.springframework.tooling.boot.ls
+START:
+/Applications/SpringToolSuite4.app/Contents/Eclipse/plugins/org.eclipse.justj.openjdk.hotspot.jre.full.macosx.aarch64_21.0.3.v20240426-1530/jre/bin/java
+-cp
+/Applications/SpringToolSuite4.app/Contents/Eclipse/plugins/org.springframework.tooling.boot.ls_1.55.1.202406141939/servers/spring-boot-language-server/BOOT-INF/classes:/Applications/SpringToolSuite4.app/Contents/Eclipse/plugins/org.springframework.tooling.boot.ls_1.55.1.202406141939/servers/spring-boot-language-server/BOOT-INF/lib/*
+-Dsts.lsp.client=eclipse
+-Xmx1024m
+-XX:TieredStopAtLevel=1
+-Xlog:jni+resolve=off
+-Dspring.config.location=file:/Applications/SpringToolSuite4.app/Contents/Eclipse/plugins/org.springframework.tooling.boot.ls_1.55.1.202406141939/servers/spring-boot-language-server/BOOT-INF/classes/application.properties
+-XX:ErrorFile=/Users/abhijain/SpringCore/.metadata/.plugins/org.springframework.tooling.boot.ls/fatal-error-spring-boot_1723546864982
+org.springframework.ide.vscode.boot.app.BootLanguageServerBootApp
+--languageserver.hover-timeout=225
+END
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-13 16:31:04.983
+!MESSAGE DelegatingStreamConnectionProvider - Starting Boot LS
+
+!ENTRY org.springframework.tooling.ls.eclipse.commons 1 0 2024-08-13 16:31:04.989
+!MESSAGE Started org.springframework.tooling.boot.ls LS process 19820
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-13 16:31:05.846
+!MESSAGE Boot project ADDED: 01-spring-security
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-13 16:31:05.846
+!MESSAGE Starting Boot LS...
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-13 16:31:05.847
+!MESSAGE Started Boot LS process
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-13 16:31:05.847
+!MESSAGE Boot project ADDED: 01-springcore-dependency-inversion
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-13 16:31:05.847
+!MESSAGE Boot project ADDED: 02-spring-hibernate
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-13 16:31:05.847
+!MESSAGE Boot project ADDED: 03-spring-rest-hibernate
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-13 16:31:05.848
+!MESSAGE Boot project ADDED: 04-spring-rest-jpa
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-13 16:31:05.848
+!MESSAGE Boot project ADDED: 05-spring-rest-jpa-employee
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-13 16:31:05.849
+!MESSAGE Boot project ADDED: 06-spring-email
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-13 16:31:05.853
+!MESSAGE Boot project ADDED: 07-spring-jpa-one-to-one
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-13 16:31:05.855
+!MESSAGE Boot project ADDED: 08-spring-jpa-one-to-many
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-13 16:31:05.868
+!MESSAGE Boot project ADDED: 09-spring-jpa-blog-comment
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-13 16:31:05.868
+!MESSAGE Boot project ADDED: 10-spring-jpa-many-to-many
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-13 16:31:05.880
+!MESSAGE Boot project ADDED: 11-spring-jpa-bank-application
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-13 16:31:05.881
+!MESSAGE Boot project ADDED: 12-spring-jpa-contact-management
+!SESSION 2024-08-16 15:48:05.178 -----------------------------------------------
+eclipse.buildId=4.23.1.202406150140
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=macosx, ARCH=aarch64, WS=cocoa, NL=en_IN
+Framework arguments:  -product org.springframework.boot.ide.branding.sts4 -keyring /Users/abhijain/.eclipse_keyring
+Command-line arguments:  -os macosx -ws cocoa -arch aarch64 -product org.springframework.boot.ide.branding.sts4 -keyring /Users/abhijain/.eclipse_keyring
+
+!ENTRY ch.qos.logback.classic 1 0 2024-08-16 15:48:06.522
+!MESSAGE Activated before the state location was initialized. Retry after the state location is initialized.
+
+!ENTRY ch.qos.logback.classic 1 0 2024-08-16 15:48:13.165
+!MESSAGE Logback config file: /Users/abhijain/SpringCore/.metadata/.plugins/org.eclipse.m2e.logback/logback.2.6.1.20240411-1122.xml
+
+!ENTRY org.eclipse.ui 2 0 2024-08-16 15:48:13.358
+!MESSAGE Warnings while parsing the commands from the 'org.eclipse.ui.commands' and 'org.eclipse.ui.actionDefinitions' extension points.
+!SUBENTRY 1 org.eclipse.ui 2 0 2024-08-16 15:48:13.358
+!MESSAGE Commands should really have a category: plug-in='org.springframework.tooling.boot.ls', id='spring.initializr.addStarters', categoryId='org.eclipse.lsp4e.commandCategory'
+
+!ENTRY org.eclipse.ui 2 0 2024-08-16 15:48:13.560
+!MESSAGE Warnings while parsing the commands from the 'org.eclipse.ui.commands' and 'org.eclipse.ui.actionDefinitions' extension points.
+!SUBENTRY 1 org.eclipse.ui 2 0 2024-08-16 15:48:13.560
+!MESSAGE Commands should really have a category: plug-in='org.springframework.tooling.boot.ls', id='spring.initializr.addStarters', categoryId='org.eclipse.lsp4e.commandCategory'
+
+!ENTRY org.springframework.tooling.ls.eclipse.commons 1 0 2024-08-16 15:48:15.945
+!MESSAGE Command list starting LS: org.springframework.tooling.boot.ls
+START:
+/Applications/SpringToolSuite4.app/Contents/Eclipse/plugins/org.eclipse.justj.openjdk.hotspot.jre.full.macosx.aarch64_21.0.3.v20240426-1530/jre/bin/java
+-cp
+/Applications/SpringToolSuite4.app/Contents/Eclipse/plugins/org.springframework.tooling.boot.ls_1.55.1.202406141939/servers/spring-boot-language-server/BOOT-INF/classes:/Applications/SpringToolSuite4.app/Contents/Eclipse/plugins/org.springframework.tooling.boot.ls_1.55.1.202406141939/servers/spring-boot-language-server/BOOT-INF/lib/*
+-Dsts.lsp.client=eclipse
+-Xmx1024m
+-XX:TieredStopAtLevel=1
+-Xlog:jni+resolve=off
+-Dspring.config.location=file:/Applications/SpringToolSuite4.app/Contents/Eclipse/plugins/org.springframework.tooling.boot.ls_1.55.1.202406141939/servers/spring-boot-language-server/BOOT-INF/classes/application.properties
+-XX:ErrorFile=/Users/abhijain/SpringCore/.metadata/.plugins/org.springframework.tooling.boot.ls/fatal-error-spring-boot_1723803495944
+org.springframework.ide.vscode.boot.app.BootLanguageServerBootApp
+--languageserver.hover-timeout=225
+END
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-16 15:48:15.945
+!MESSAGE DelegatingStreamConnectionProvider - Starting Boot LS
+
+!ENTRY org.springframework.tooling.ls.eclipse.commons 1 0 2024-08-16 15:48:15.950
+!MESSAGE Started org.springframework.tooling.boot.ls LS process 60841
+
+!ENTRY org.eclipse.debug.core 4 125 2024-08-16 15:48:16.885
+!MESSAGE Error logged from Debug Core: 
+!STACK 0
+java.io.IOException: Stream closed
+	at java.base/java.io.BufferedInputStream.ensureOpen(BufferedInputStream.java:206)
+	at java.base/java.io.BufferedInputStream.implRead(BufferedInputStream.java:411)
+	at java.base/java.io.BufferedInputStream.read(BufferedInputStream.java:405)
+	at java.base/java.io.FilterInputStream.read(FilterInputStream.java:95)
+	at org.eclipse.debug.internal.core.OutputStreamMonitor.internalRead(OutputStreamMonitor.java:249)
+	at org.eclipse.debug.internal.core.OutputStreamMonitor.read(OutputStreamMonitor.java:225)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+
+!ENTRY org.eclipse.debug.core 4 125 2024-08-16 15:48:16.886
+!MESSAGE Error logged from Debug Core: 
+!STACK 0
+java.io.IOException: Stream closed
+	at java.base/java.io.BufferedInputStream.ensureOpen(BufferedInputStream.java:206)
+	at java.base/java.io.BufferedInputStream.implRead(BufferedInputStream.java:411)
+	at java.base/java.io.BufferedInputStream.read(BufferedInputStream.java:405)
+	at java.base/java.io.FilterInputStream.read(FilterInputStream.java:95)
+	at org.eclipse.debug.internal.core.OutputStreamMonitor.internalRead(OutputStreamMonitor.java:249)
+	at org.eclipse.debug.internal.core.OutputStreamMonitor.read(OutputStreamMonitor.java:225)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-16 15:48:16.939
+!MESSAGE Boot project ADDED: 01-spring-security
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-16 15:48:16.939
+!MESSAGE Starting Boot LS...
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-16 15:48:16.941
+!MESSAGE Started Boot LS process
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-16 15:48:16.942
+!MESSAGE Boot project ADDED: 01-springcore-dependency-inversion
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-16 15:48:16.942
+!MESSAGE Boot project ADDED: 02-spring-hibernate
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-16 15:48:16.942
+!MESSAGE Boot project ADDED: 03-spring-rest-hibernate
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-16 15:48:16.942
+!MESSAGE Boot project ADDED: 04-spring-rest-jpa
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-16 15:48:16.943
+!MESSAGE Boot project ADDED: 05-spring-rest-jpa-employee
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-16 15:48:16.943
+!MESSAGE Boot project ADDED: 06-spring-email
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-16 15:48:16.943
+!MESSAGE Boot project ADDED: 07-spring-jpa-one-to-one
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-16 15:48:16.943
+!MESSAGE Boot project ADDED: 08-spring-jpa-one-to-many
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-16 15:48:16.943
+!MESSAGE Boot project ADDED: 09-spring-jpa-blog-comment
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-16 15:48:16.945
+!MESSAGE Boot project ADDED: 10-spring-jpa-many-to-many
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-16 15:48:16.946
+!MESSAGE Boot project ADDED: 11-spring-jpa-bank-application
+
+!ENTRY org.springframework.tooling.boot.ls 1 0 2024-08-16 15:48:16.946
+!MESSAGE Boot project ADDED: 12-spring-jpa-contact-management
+
+!ENTRY org.eclipse.lsp4e 2 0 2024-08-16 16:11:43.334
+!MESSAGE Javadoc unavailable. Failed to obtain it.
+!STACK 0
+java.lang.InterruptedException
+	at java.base/java.util.concurrent.CompletableFuture.reportGet(CompletableFuture.java:386)
+	at java.base/java.util.concurrent.CompletableFuture.get(CompletableFuture.java:2096)
+	at org.eclipse.lsp4e.jdt.LSJavaHoverProvider.getHoverInfo2(LSJavaHoverProvider.java:65)
+	at org.eclipse.jdt.internal.ui.text.java.hover.BestMatchHover.getHoverInfo2(BestMatchHover.java:163)
+	at org.eclipse.jdt.internal.ui.text.java.hover.BestMatchHover.getHoverInfo2(BestMatchHover.java:130)
+	at org.eclipse.jdt.internal.ui.text.java.hover.JavaEditorTextHoverProxy.getHoverInfo2(JavaEditorTextHoverProxy.java:89)
+	at org.eclipse.jface.text.TextViewerHoverManager$1.run(TextViewerHoverManager.java:155)
