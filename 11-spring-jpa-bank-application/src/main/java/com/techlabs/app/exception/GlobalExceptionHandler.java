@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
 		ErrorResponse error = new ErrorResponse(HttpStatus.NOT_FOUND.value(), exception.getMessage(),
 				LocalDateTime.now());
 
-		return new ResponseEntity<ErrorResponse>(error, HttpStatus.OK);
+		return new ResponseEntity<ErrorResponse>(error, HttpStatus.BAD_REQUEST);
 
 	}
 	
@@ -29,7 +29,7 @@ public class GlobalExceptionHandler {
 		ErrorResponse error = new ErrorResponse(HttpStatus.NOT_FOUND.value(), exception.getMessage(),
 				LocalDateTime.now());
 
-		return new ResponseEntity<ErrorResponse>(error, HttpStatus.OK);
+		return new ResponseEntity<ErrorResponse>(error, HttpStatus.BAD_REQUEST);
 
 	}
 

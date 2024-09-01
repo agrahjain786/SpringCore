@@ -37,9 +37,12 @@ public class FileServiceImpl implements FileService{
             }
             Files.write(path, file.getBytes());
         } 
+        catch(UserException e) {
+        	throw new UserException(e.getMessage());
+        }
         catch (IOException e) {
         	
-            throw new UserException("Could not upload the file: Error Occurred");
+            throw new UserException("Could not upload the file! Error Occurred. Please try again later");
         }
 		
 	}
@@ -47,30 +50,39 @@ public class FileServiceImpl implements FileService{
 	@Override
 	public List<byte[]> getFiles(int customerId) {
 		String directory_path = "src/main/java/com/techlabs/app/attachments/"+customerId+"/";
-
-		File directory = new File(directory_path);
 		
-		if (!directory.exists() || !directory.isDirectory()) {
-            throw new UserException("Directory does not exist for customerId: " + customerId);
-        }
-
-        List<byte[]> fileContents = new ArrayList<>();
-        
-        // List all files in the directory and read them
-        File[] files = directory.listFiles(File::isFile);
-        if(files == null) {
-        	throw new UserException("No files Uploaded!!");
-        }
-		for (File file : files) {
-			try {
-				byte[] content = Files.readAllBytes(file.toPath());
-				fileContents.add(content);
-			} catch (IOException e) {
-				throw new UserException("Error reading file: " + file.getName());
+		try {
+		
+			File directory = new File(directory_path);
+			
+			if (!directory.exists() || !directory.isDirectory()) {
+	            throw new UserException("Directory does not exist for customerId: " + customerId);
+	        }
+	
+	        List<byte[]> fileContents = new ArrayList<>();
+	        
+	        // List all files in the directory and read them
+	        File[] files = directory.listFiles(File::isFile);
+	        if(files == null) {
+	        	throw new UserException("No files Uploaded!!");
+	        }
+			for (File file : files) {
+				try {
+					byte[] content = Files.readAllBytes(file.toPath());
+					fileContents.add(content);
+				} catch (IOException e) {
+					throw new UserException("Error reading file: " + file.getName());
+				}
 			}
+	
+			return fileContents;
 		}
-
-		return fileContents;
+		catch (UserException e){
+			throw new UserException(e.getMessage());
+		}
+		catch(Exception e) {
+			throw new UserException("Unexpected Error occurred");
+		}
 	}
 
 }

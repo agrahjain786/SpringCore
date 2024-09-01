@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.techlabs.app.dto.AccountDTO;
+import com.techlabs.app.dto.SystemCounts;
 import com.techlabs.app.dto.TransactionDTO;
 import com.techlabs.app.dto.UserDTO;
 import com.techlabs.app.dto.UserResponseDTO;
@@ -75,6 +76,44 @@ public class AdminController {
 			@RequestParam(name = "startsWith") String startWith){
 		
 		PagedResponse<UserResponseDTO> users = adminService.getAllUsersByFirstNameStartsWith(page,size,sortBy,direction,startWith);
+		
+		return new ResponseEntity<PagedResponse<UserResponseDTO>>(users, HttpStatus.OK);
+		
+	}
+	
+	@Operation(summary = "By Admin: Get All the customers")
+	@GetMapping("/customers")
+	public ResponseEntity<PagedResponse<UserResponseDTO>> getAllCustomers(
+			@RequestParam(name = "page", defaultValue = "0") int page,
+			@RequestParam(name = "size", defaultValue = "5") int size,
+			@RequestParam(name = "sortBy", defaultValue = "id") String sortBy,
+			@RequestParam(name = "direction", defaultValue = "asc") String direction){
+		
+		PagedResponse<UserResponseDTO> customers = adminService.getAllCustomers(page,size,sortBy,direction);
+		
+		return new ResponseEntity<PagedResponse<UserResponseDTO>>(customers, HttpStatus.OK);
+		
+	}
+	
+	@Operation(summary = "By Admin: Get Customer by ID")
+	@GetMapping("/customer/{id}")
+	public ResponseEntity<UserResponseDTO> getCustomerById(@PathVariable(name="id")int userId){
+		UserResponseDTO user = adminService.getCustomerById(userId);
+		
+		return new ResponseEntity<UserResponseDTO>(user, HttpStatus.OK);
+		
+	}
+	
+	@Operation(summary = "By Admin: Get All Customers By Characters their First Name with")
+	@GetMapping("/customers/starts-with")
+	public ResponseEntity<PagedResponse<UserResponseDTO>> getAllCustomersByFirstNameStartsWith(
+			@RequestParam(name = "page", defaultValue = "0") int page,
+			@RequestParam(name = "size", defaultValue = "5") int size,
+			@RequestParam(name = "sortBy", defaultValue = "id") String sortBy,
+			@RequestParam(name = "direction", defaultValue = "asc") String direction,
+			@RequestParam(name = "startsWith") String startWith){
+		
+		PagedResponse<UserResponseDTO> users = adminService.getAllCustomersByFirstNameStartsWith(page,size,sortBy,direction,startWith);
 		
 		return new ResponseEntity<PagedResponse<UserResponseDTO>>(users, HttpStatus.OK);
 		
@@ -294,7 +333,20 @@ public class AdminController {
 		List<byte[]> fileContent = adminService.getFileContent(customerId, fileNumber);
 		
 		byte[] content = fileContent.get(fileNumber-1);
-		return ResponseEntity.status(HttpStatus.FOUND).contentType(MediaType.valueOf("image/png")).body(content);
+		System.out.println("image returned");
+		return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.valueOf("image/png")).body(content);
 	}
+	
+	
+	
+	@Operation(summary = "By Admin: Make the All the customers Activate who have made request")
+	@GetMapping("/counts")
+	public ResponseEntity<SystemCounts> wholeSystemStats() {
+		SystemCounts counts = adminService.wholeSystemStats();
+		
+		return new ResponseEntity<SystemCounts>(counts,HttpStatus.OK);
+	}
+	
+	
 	
 }

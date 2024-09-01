@@ -14,7 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.techlabs.app.dto.AccountDTO;
-import com.techlabs.app.dto.BalanceDTO;
 import com.techlabs.app.dto.CustomerDTO;
 import com.techlabs.app.dto.TransactionDTO;
 import com.techlabs.app.dto.UserDTO;
@@ -32,6 +31,7 @@ import com.techlabs.app.repository.ActivationRequestRepository;
 import com.techlabs.app.repository.CustomerRepository;
 import com.techlabs.app.repository.TransactionRepository;
 import com.techlabs.app.repository.UserRepository;
+import com.techlabs.app.util.BalancePagedResponse;
 import com.techlabs.app.util.PagedResponse;
 
 @Service
@@ -152,144 +152,209 @@ public class CustomerServiceImpl implements CustomerService{
 
 	@Override
 	public UserResponseDTO getUserProfileUpdate(UserDTO userDTO) {
-		String usernameOrEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-	    User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
-	            .orElseThrow(() -> new UserException("User not found with username or email: " + usernameOrEmail));
-
-	    user.setFirstName(userDTO.getFirstName());
-	    user.setLastName(userDTO.getLastName());
-	    user.setUsername(userDTO.getUsername());
-	    user.setEmail(userDTO.getEmail());
-	    user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-	    userRepository.save(user);
-	    
-	    UserResponseDTO customerDTO = convertUserEntityToDTO(user);
-	    return customerDTO;
+		try {
+			String usernameOrEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+		    User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
+		            .orElseThrow(() -> new UserException("User not found with username or email: " + usernameOrEmail));
+	
+		    user.setFirstName(userDTO.getFirstName());
+		    user.setLastName(userDTO.getLastName());
+		    user.setUsername(userDTO.getUsername());
+		    user.setEmail(userDTO.getEmail());
+		    user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+		    userRepository.save(user);
+		    
+		    UserResponseDTO customerDTO = convertUserEntityToDTO(user);
+		    return customerDTO;
+	    }
+		catch(Exception e) {
+			throw new UserException("Unexpected error occurred while updating your profile. Please try again later");
+		}
 	}
 
 	@Override
 	public TransactionDTO generateTransaction(TransactionDTO transactionDTO) {
-		String usernameOrEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-	    User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
-	            .orElseThrow(() -> new UserException("User not found with username or email: " + usernameOrEmail));
-	    
-	    Account senderAccount = accountRepository.findById(transactionDTO.getSenderAccountNumber())
-	            .orElseThrow(() -> new AccountException("Sender account not found"));
-	    Account receiverAccount = accountRepository.findById(transactionDTO.getReceiverAccountNumber())
-	            .orElseThrow(() -> new AccountException("Receiver account not found"));
-	    
-	    if(!receiverAccount.isActive()) {
-	    	throw new AccountException("Receiver Account is not active");
-	    }
-	    
-	    if (!senderAccount.getCustomer().getUser().equals(user)) {
-	        throw new AccountException("Sender account does not belong to the authenticated user");
-	    }
-	    
-	    if(!senderAccount.isActive()) {
-	    	throw new AccountException("Your account is inactive. Please contact Admin to make it active.");
-	    }
-	    
-	    boolean isSameAccount = senderAccount.equals(receiverAccount);
-	    
-	    double amount = transactionDTO.getAmount();
-	    String transactionType = transactionDTO.getTransactionType().toLowerCase();
-	    
-	    if (isSameAccount && transactionType.equals("transfer")) {
-	        throw new AccountException("Sender and Receiver cannot be the same for a transfer transaction.");
-	    }
-	    
-	    if (transactionType.equals("debit") || transactionType.equals("transfer")) {
-	    	if (senderAccount.getBalance() < amount) {
-	            throw new AccountException("Insufficient funds in your account");
-	        }
-	    	senderAccount.setBalance(senderAccount.getBalance() - amount);
-	    	senderAccount.getCustomer().setTotalBalance(senderAccount.getCustomer().getTotalBalance() - amount);
-	    	accountRepository.save(senderAccount);
-	    }
-	    
-	    if (transactionType.equals("credit") || transactionType.equals("transfer")) {
-	    	receiverAccount.setBalance(receiverAccount.getBalance() + amount);
-	    	receiverAccount.getCustomer().setTotalBalance(receiverAccount.getCustomer().getTotalBalance() + amount);
-	    	accountRepository.save(receiverAccount);
-	    }
-	    
-	    
-	    Transaction transaction = new Transaction();
-	    transaction.setSenderAccountNumber(transactionDTO.getSenderAccountNumber());
-	    transaction.setReceiverAccountNumber(transactionDTO.getReceiverAccountNumber());
-	    transaction.setTransactionType(transactionDTO.getTransactionType());
-	    transaction.setAmount(transactionDTO.getAmount());
-	    transaction.setTransactionDate(LocalDateTime.now());
-	    
-	    transactionRepository.save(transaction);
-	    
-	    return convertTransactionToDTO(transaction);
+		try {
+			String usernameOrEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+		    User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
+		            .orElseThrow(() -> new UserException("User not found with username or email: " + usernameOrEmail));
+		    
+		    Account senderAccount = accountRepository.findById(transactionDTO.getSenderAccountNumber())
+		            .orElseThrow(() -> new AccountException("Sender account not found"));
+		    Account receiverAccount = accountRepository.findById(transactionDTO.getReceiverAccountNumber())
+		            .orElseThrow(() -> new AccountException("Receiver account not found"));
+		    
+		    if(!receiverAccount.isActive()) {
+		    	throw new AccountException("Receiver Account is not active");
+		    }
+		    
+		    if (!senderAccount.getCustomer().getUser().equals(user)) {
+		        throw new AccountException("Sender account does not belong to the authenticated user");
+		    }
+		    
+		    if(!senderAccount.isActive()) {
+		    	throw new AccountException("Your account is inactive. Please contact Admin to make it active.");
+		    }
+		    
+		    boolean isSameAccount = senderAccount.equals(receiverAccount);
+		    
+		    double amount = transactionDTO.getAmount();
+		    String transactionType = transactionDTO.getTransactionType().toLowerCase();
+		    
+		    if (isSameAccount && transactionType.equals("transfer")) {
+		        throw new AccountException("Sender and Receiver cannot be the same for a transfer transaction.");
+		    }
+		    
+		    if (transactionType.equals("debit") || transactionType.equals("transfer")) {
+		    	if (senderAccount.getBalance() < amount) {
+		            throw new AccountException("Insufficient funds in your account");
+		        }
+		    	senderAccount.setBalance(senderAccount.getBalance() - amount);
+		    	senderAccount.getCustomer().setTotalBalance(senderAccount.getCustomer().getTotalBalance() - amount);
+		    	accountRepository.save(senderAccount);
+		    }
+		    
+		    if (transactionType.equals("credit") || transactionType.equals("transfer")) {
+		    	receiverAccount.setBalance(receiverAccount.getBalance() + amount);
+		    	receiverAccount.getCustomer().setTotalBalance(receiverAccount.getCustomer().getTotalBalance() + amount);
+		    	accountRepository.save(receiverAccount);
+		    }
+		    
+		    
+		    Transaction transaction = new Transaction();
+		    transaction.setSenderAccountNumber(transactionDTO.getSenderAccountNumber());
+		    transaction.setReceiverAccountNumber(transactionDTO.getReceiverAccountNumber());
+		    transaction.setTransactionType(transactionDTO.getTransactionType());
+		    transaction.setAmount(transactionDTO.getAmount());
+		    transaction.setTransactionDate(LocalDateTime.now());
+		    
+		    transactionRepository.save(transaction);
+		    
+		    return convertTransactionToDTO(transaction);
+		}
+		catch(AccountException e) {
+			throw new UserException(e.getMessage());
+		}
+		catch(Exception e) {
+			throw new UserException("Error Occurred while making transaction. please try again later");
+		}
 	}
 	
 	
 	@Override
-	public BalanceDTO getTotalAndIndividualBalance() {
-		String usernameOrEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-	    User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
-	            .orElseThrow(() -> new UserException("User not found with username or email: " + usernameOrEmail));
-	    
-	    Customer customer = user.getCustomer();
-	    List<Account> accounts = customer.getAccounts();
-	    double totalBalance = accounts.stream()
-                .mapToDouble(Account::getBalance)
-                .sum();
-	    List<AccountDTO> accountDTOs = accounts.stream()
-	            .map(account -> new AccountDTO(account.getAccountNumber(), account.getAccountType(), account.getBalance(), account.isActive()))
-	            .toList();
-	    BalanceDTO balance = new BalanceDTO(totalBalance, accountDTOs);
-	    
-	    return balance;
+	public List<AccountDTO> getAllAccounts() {
+		try {
+
+			String usernameOrEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+		    User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
+		            .orElseThrow(() -> new UserException("User not found with username or email: " + usernameOrEmail));
+		    
+		    Customer customer = user.getCustomer();
+		    List<Account> accounts = customer.getAccounts();
+		    List<AccountDTO> accountDTOs = accounts.stream()
+		            .map(account -> new AccountDTO(account.getAccountNumber(), account.getAccountType(), account.getBalance(), account.isActive()))
+		            .toList();
+		    
+		    return accountDTOs;
+		}
+		catch(Exception e) {
+			throw new UserException("Error occurred while fetching your accounts");
+		}
 	}
+	
+	
+	@Override
+	public BalancePagedResponse<AccountDTO> getTotalAndIndividualBalance(int page, int size, String sortBy,
+			String direction) {
+		try {
+			String usernameOrEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+		    User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
+		            .orElseThrow(() -> new UserException("User not found with username or email: " + usernameOrEmail));
+		    
+		    Customer customer = user.getCustomer();
+		    
+		    Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+			
+			Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+			
+			Page<Account> pages = accountRepository.findByCustomer(customer, pageable);
+			List<Account> allUserAccounts = pages.getContent();
+			List<AccountDTO> allUserAccountsDTO = convertAccountListEntityToDTO(allUserAccounts);
+			
+			List<Account> accounts = customer.getAccounts();
+		    double totalBalance = accounts.stream()
+	                .mapToDouble(Account::getBalance)
+	                .sum();
+		    
+		    return new BalancePagedResponse<AccountDTO>(allUserAccountsDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast(), totalBalance);
+		}
+		catch(Exception e) {
+			throw new UserException("Error Occurred! Please try again later");
+		}
+	}
+	
 	
 	
 	@Override
 	public void requestAccountActivation(int accountNumber) {
-		String usernameOrEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-	    User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
-	            .orElseThrow(() -> new UserException("User not found with username or email: " + usernameOrEmail));
-	    
-	    Account account = accountRepository.findById(accountNumber).orElseThrow(()->new AccountException("No Such Account exists with this account Number"));
-		
-	    if(!account.getCustomer().getUser().equals(user)) {
-	    	throw new UserException("This account does not belongs to you");
-	    }
-	    
-	    if (account.isActive()) {
-	        throw new UserException("Account is already active.");
-	    }
-	    
-	    ActivationRequest activationRequest = new ActivationRequest();
-	    activationRequest.setCustomerIdOrAccountNumber(accountNumber);
-	    activationRequest.setRequestDate(LocalDateTime.now());
-	    activationRequest.setRequestType("AccountActivation");
-	    activationRequest.setStatus("Pending");
-	    
-	    activationRequestRepository.save(activationRequest);
+		try {
+			String usernameOrEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+		    User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
+		            .orElseThrow(() -> new UserException("User not found with username or email: " + usernameOrEmail));
+		    
+		    Account account = accountRepository.findById(accountNumber).orElseThrow(()->new AccountException("No Such Account exists with this account Number"));
+			
+		    if(!account.getCustomer().getUser().equals(user)) {
+		    	throw new UserException("This account does not belongs to you");
+		    }
+		    
+		    if (account.isActive()) {
+		        throw new UserException("Account is already active.");
+		    }
+		    
+		    boolean pendingRequestExists = activationRequestRepository.existsByCustomerIdOrAccountNumberAndStatus(accountNumber, "Pending");
+		    if (pendingRequestExists) {
+		    	throw new UserException("An activation request for this account is already made and its status is still Pending. Wait for some time to activate this account");
+		    }
+		    
+		    ActivationRequest activationRequest = new ActivationRequest();
+		    activationRequest.setCustomerIdOrAccountNumber(accountNumber);
+		    activationRequest.setRequestDate(LocalDateTime.now());
+		    activationRequest.setRequestType("AccountActivation");
+		    activationRequest.setStatus("Pending");
+		    
+		    activationRequestRepository.save(activationRequest);
+		}
+		catch(UserException e) {
+			throw new UserException(e.getMessage());
+		}
+		catch(Exception e) {
+			throw new UserException("Unexpected request has been occurred. Please try again later");
+		}
 	}
 	
 	
 	
 	@Override
 	public List<Transaction> getPassbook() {
-		String usernameOrEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-	    User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
-	            .orElseThrow(() -> new UserException("User not found with username or email: " + usernameOrEmail));
-	    
-	    Customer customer = user.getCustomer();
-	    
-	    List<Integer> accountNumbers = customer.getAccounts().stream()
-	            .map(Account::getAccountNumber)
-	            .collect(Collectors.toList());
-	    
-		List<Transaction> allUserTransactions = transactionRepository.findBySenderAccountNumberInOrReceiverAccountNumberIn(accountNumbers, accountNumbers);
-		
-		return allUserTransactions;
+		try {
+			String usernameOrEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+		    User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
+		            .orElseThrow(() -> new UserException("User not found with username or email: " + usernameOrEmail));
+		    
+		    Customer customer = user.getCustomer();
+		    
+		    List<Integer> accountNumbers = customer.getAccounts().stream()
+		            .map(Account::getAccountNumber)
+		            .collect(Collectors.toList());
+		    
+			List<Transaction> allUserTransactions = transactionRepository.findBySenderAccountNumberInOrReceiverAccountNumberIn(accountNumbers, accountNumbers);
+			
+			return allUserTransactions;
+		}
+		catch(Exception e) {
+			throw new UserException("Error occurred while downloading passbook");
+		}
 	}
 
 	@Override
@@ -308,6 +373,28 @@ public class CustomerServiceImpl implements CustomerService{
 	    
 	    return allUserTransactions;
 	}
+	
+	
+	@Override
+	public List<Transaction> getPassbookByAccountNumber(int accountNumber) {
+		String usernameOrEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+	    User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
+	            .orElseThrow(() -> new UserException("User not found with username or email: " + usernameOrEmail));
+	    
+	    Customer customer = user.getCustomer();
+	    
+	    boolean ownsAccount = customer.getAccounts().stream()
+	            .anyMatch(account -> account.getAccountNumber() == accountNumber);
+	    
+	    if (!ownsAccount) {
+	        throw new UserException("The account number " + accountNumber + " does not belong to the authenticated user.");
+	    }
+	    
+	    List<Transaction> transactions = transactionRepository.findBySenderAccountNumberOrReceiverAccountNumber(accountNumber, accountNumber);
+	    
+	    return transactions;
+	}
+
 
 
 
@@ -367,6 +454,12 @@ public class CustomerServiceImpl implements CustomerService{
 	    
 	    return customerDTO;
 	}
+	
+	private List<AccountDTO> convertAccountListEntityToDTO(List<Account> allaccounts) {
+		return allaccounts.stream()
+	            .map(this::convertAccountToDTO)
+	            .collect(Collectors.toList());
+	}
 
 	private AccountDTO convertAccountToDTO(Account account) {
 		AccountDTO accountDTO = new AccountDTO();
@@ -376,6 +469,7 @@ public class CustomerServiceImpl implements CustomerService{
 	    accountDTO.setActive(account.isActive());
 	    return accountDTO;
 	}
+
 
 
 

@@ -40,4 +40,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
 			List<Integer> accountNumbers, List<Integer> accountNumbers2, LocalDateTime startDate,
 			LocalDateTime endDate);
 
+	List<Transaction> findBySenderAccountNumberOrReceiverAccountNumber(int accountNumber, int accountNumber2);
+
 }

@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import com.techlabs.app.dto.AccountDTO;
 import com.techlabs.app.dto.CustomerDTO;
+import com.techlabs.app.dto.SystemCounts;
 import com.techlabs.app.dto.TransactionDTO;
 import com.techlabs.app.dto.UserDTO;
 import com.techlabs.app.dto.UserResponseDTO;
@@ -29,6 +32,7 @@ import com.techlabs.app.exception.AccountException;
 import com.techlabs.app.exception.UserException;
 import com.techlabs.app.repository.AccountRepository;
 import com.techlabs.app.repository.ActivationRequestRepository;
+import com.techlabs.app.repository.AdminRepository;
 import com.techlabs.app.repository.CustomerRepository;
 import com.techlabs.app.repository.RoleRepository;
 import com.techlabs.app.repository.TransactionRepository;
@@ -45,6 +49,8 @@ public class AdminServiceImpl implements AdminService{
 	
 	private UserRepository userRepository;
 	
+	private AdminRepository adminRepository;
+	
 	private RoleRepository roleRepository;
 	
 	private PasswordEncoder passwordEncoder;
@@ -60,7 +66,7 @@ public class AdminServiceImpl implements AdminService{
 	public AdminServiceImpl(AccountRepository accountRepository, TransactionRepository transactionRepository,
 			UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, 
 			EmailService emailService, CustomerRepository customerRepository, ActivationRequestRepository activationRequestRepository,
-			FileService fileService) {
+			FileService fileService,AdminRepository adminRepository) {
 		super();
 		this.accountRepository = accountRepository;
 		this.transactionRepository = transactionRepository;
@@ -71,6 +77,7 @@ public class AdminServiceImpl implements AdminService{
 		this.customerRepository = customerRepository;
 		this.activationRequestRepository = activationRequestRepository;
 		this.fileService = fileService;
+		this.adminRepository = adminRepository;
 	}
 
 	@Override
@@ -107,6 +114,57 @@ public class AdminServiceImpl implements AdminService{
 		
 		return new PagedResponse<UserResponseDTO>(allUsersDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
 	}
+	
+	
+
+	@Override
+	public PagedResponse<UserResponseDTO> getAllCustomers(int page, int size, String sortBy, String direction) {
+		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name()) ? Sort.by(sortBy).descending(): Sort.by(sortBy).ascending();
+
+		Pageable pageable = (Pageable)PageRequest.of(page, size, sort);
+
+		Page<Customer> pages = customerRepository.findAll(pageable);
+		List<Customer> allInactiveCustomers = pages.getContent();
+		List<UserResponseDTO> inactiveCustomersDTO = allInactiveCustomers.stream()
+				.map(customer -> convertUserEntityToDTO(customer.getUser())).collect(Collectors.toList());
+		
+		return new PagedResponse<UserResponseDTO>(inactiveCustomersDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+	}
+	
+	
+	
+
+	@Override
+	public UserResponseDTO getCustomerById(int userId) {
+		Customer customer = customerRepository.findById(userId).orElseThrow(()->new UserException("User Not Found!"));
+		
+		return convertUserEntityToDTO(customer.getUser());
+	}
+
+	@Override
+	public PagedResponse<UserResponseDTO> getAllCustomersByFirstNameStartsWith(int page, int size, String sortBy,
+			String direction, String startWith) {
+		
+		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+		
+		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+		
+		Page<Customer> pages = customerRepository.findByUserFirstNameStartingWith(startWith, pageable);
+	    List<Customer> allCustomers = pages.getContent();
+	    List<User> allUsers = allCustomers.stream()
+	            .map(Customer::getUser)
+	            .collect(Collectors.toList());
+		List<UserResponseDTO> allUsersDTO = convertUserListEntityToDTO(allUsers);
+		
+		return new PagedResponse<UserResponseDTO>(allUsersDTO, pages.getNumber(), pages.getSize(), pages.getTotalElements(), pages.getTotalPages(), pages.isLast());
+	}
+
+
+
+
+
+
+
 
 	@Override
 	public PagedResponse<TransactionDTO> getAllTransactions(int page, int size, String sortBy, String direction) {
@@ -156,21 +214,44 @@ public class AdminServiceImpl implements AdminService{
 
 	@Override
 	public UserResponseDTO createAdmin(UserDTO userDTO) {
-		userDTO.setId(0);
-		User user = convertUserDTOToEntity(userDTO);
-		
-		Admin admin = new Admin();
-		admin.setUser(user);
-		user.setAdmin(admin);
-		userRepository.save(user);
-		
-		String subject = "Creation of Admin";
-		String text = "Hey! \n\nProfile has been created as the role of Admin with \nID: "+user.getId()+"\n"
-				+ "Username : "+user.getUsername()+"\nEmail: "+user.getEmail()+"\nFull Name: "+user.getFirstName()+" "+user.getLastName();
-		
-		emailService.sendSimpleMail(user.getEmail(),subject,text);
-		
-		return convertUserEntityToDTO(user);
+		try {
+	        userDTO.setId(0);
+	        User user = convertUserDTOToEntity(userDTO);
+	        Admin admin = new Admin();
+	        admin.setUser(user);
+	        user.setAdmin(admin);
+	        userRepository.save(user);
+
+	        String subject = "Creation of Admin";
+	        String text = "Hey! \n\nProfile has been created as the role of Admin with \nID: " + user.getId() + "\n"
+	                    + "Username : " + user.getUsername() + "\nEmail: " + user.getEmail() + "\nFull Name: " + user.getFirstName() + " " + user.getLastName();
+
+
+	        try {
+	            emailService.sendSimpleMail(user.getEmail(), subject, text);
+	        } catch (Exception e) {
+	            throw new Exception(e.getMessage());
+	        }
+
+	        return convertUserEntityToDTO(user);
+
+	    } 
+		catch (DataIntegrityViolationException e) {
+			if (e.getCause() instanceof ConstraintViolationException) {
+		        ConstraintViolationException constraintEx = (ConstraintViolationException) e.getCause();
+		        String rootCauseMessage = constraintEx.getSQLException().getMessage();
+
+		        if (rootCauseMessage.contains("UK6dotkott2kjsp8vw4d0m25fb7")) {
+		            throw new UserException("Email must be unique");
+		        } else if (rootCauseMessage.contains("UKr43af9ap4edm43mmtq01oddj6")) {
+		            throw new UserException("Username must be unique");
+		        }
+		    }
+		    throw new UserException("Data integrity violation occurred while creating admin profile");
+	    } 
+		catch (Exception e) {
+	        throw new UserException("Error occurred while creating admin profile");
+	    }
 	}
 
 	
@@ -178,38 +259,50 @@ public class AdminServiceImpl implements AdminService{
 
 	@Override
 	public UserResponseDTO createUserAccount(int userId, AccountDTO accountDTO) {
-		if(accountDTO.getBalance() < 1000) throw new AccountException("Initial Balance of account must be greater than 1000");
+		try {
 		
-		Customer customer = customerRepository.findById(userId).orElseThrow(()->new UserException("Customer Not Found!"));
-		
-		User user = customer.getUser();
-		
-		if(!customer.isActive()) {
-			throw new UserException("This customer is inactive. Please contact Admin to make it active.");
+			if(accountDTO.getBalance() < 1000) throw new AccountException("Initial Balance of account must be greater than 1000");
+			
+			Customer customer = customerRepository.findById(userId).orElseThrow(()->new UserException("Customer Not Found!"));
+			
+			User user = customer.getUser();
+			
+			if(!customer.isActive()) {
+				throw new UserException("This customer is inactive");
+			}
+			
+			Account account = convertDTOToAccountEntity(accountDTO);
+			account.setActive(true);
+			account.setCustomer(customer);
+			Account savedAccount = accountRepository.save(account);
+			customer.getAccounts().add(account);
+			customer.setTotalBalance(customer.getTotalBalance()+account.getBalance());
+	//		customerRepository.save(customer);
+			
+			Transaction transaction = new Transaction();
+			transaction.setAmount(savedAccount.getBalance());
+			transaction.setSenderAccountNumber(savedAccount.getAccountNumber());
+			transaction.setReceiverAccountNumber(savedAccount.getAccountNumber());
+			transaction.setTransactionDate(LocalDateTime.now());
+			transaction.setTransactionType("credit");
+			
+			transactionRepository.save(transaction);
+			
+			String subject = "Creation of Customer Bank Account";
+			String text = "Hey! \n\nBank Account has been created for \nID: "+user.getId()+"\n"
+					+ "Username : "+user.getUsername()+"\nEmail: "+user.getEmail()+"\nFull Name: "+user.getFirstName()+" "+user.getLastName();
+			try {
+		        emailService.sendSimpleMail(user.getEmail(), subject, text);
+		    } catch (Exception e) {
+		        throw new UserException(e.getMessage());
+		    }
+			return convertUserEntityToDTO(user);
 		}
-		
-		Account account = convertDTOToAccountEntity(accountDTO);
-		account.setActive(true);
-		account.setCustomer(customer);
-		Account savedAccount = accountRepository.save(account);
-		customer.getAccounts().add(account);
-		customer.setTotalBalance(customer.getTotalBalance()+account.getBalance());
-//		customerRepository.save(customer);
-		
-		Transaction transaction = new Transaction();
-		transaction.setAmount(savedAccount.getBalance());
-		transaction.setSenderAccountNumber(savedAccount.getAccountNumber());
-		transaction.setReceiverAccountNumber(savedAccount.getAccountNumber());
-		transaction.setTransactionDate(LocalDateTime.now());
-		transaction.setTransactionType("credit");
-		
-		transactionRepository.save(transaction);
-		
-		String subject = "Creation of Customer Bank Account";
-		String text = "Hey! \n\nBank Account has been created for \nID: "+user.getId()+"\n"
-				+ "Username : "+user.getUsername()+"\nEmail: "+user.getEmail()+"\nFull Name: "+user.getFirstName()+" "+user.getLastName();
-		emailService.sendSimpleMail(user.getEmail(),subject,text);
-		return convertUserEntityToDTO(user);
+		catch (AccountException | UserException e) {
+	        throw new UserException(e.getMessage());
+	    } catch (Exception e) {
+	        throw new UserException("An unexpected error occurred while creating the user account.");
+	    }
 	}
 
 	@Override
@@ -255,19 +348,25 @@ public class AdminServiceImpl implements AdminService{
 
 	@Override
 	public UserResponseDTO updateAdminProfile(UserDTO userDTO) {
-		String usernameOrEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-	    User admin = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
-	        .orElseThrow(() -> new UserException("Admin not found!"));
-	    
-	    admin.setFirstName(userDTO.getFirstName());
-	    admin.setLastName(userDTO.getLastName());
-	    admin.setUsername(userDTO.getUsername());
-	    admin.setEmail(userDTO.getEmail());
-	    admin.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-	    userRepository.save(admin);
-	    
-	    UserResponseDTO adminResponseDTO = convertUserEntityToDTO(admin);
-	    return adminResponseDTO;
+		try {
+			
+			String usernameOrEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+		    User admin = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
+		        .orElseThrow(() -> new UserException("Admin not found!"));
+		    
+		    admin.setFirstName(userDTO.getFirstName());
+		    admin.setLastName(userDTO.getLastName());
+		    admin.setUsername(userDTO.getUsername());
+		    admin.setEmail(userDTO.getEmail());
+		    admin.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+		    userRepository.save(admin);
+		    
+		    UserResponseDTO adminResponseDTO = convertUserEntityToDTO(admin);
+		    return adminResponseDTO;
+	    }
+		catch(Exception e) {
+			throw new UserException("Error occurred when updating your profile. Please try again later");
+		}
 	}
 	
 	
@@ -302,67 +401,78 @@ public class AdminServiceImpl implements AdminService{
 	
 	@Override
 	public int makeActiveCustomersInactive() {
-		LocalDateTime oneYearAgo = LocalDateTime.now().minusYears(1);
-		
-		List<Customer> customers = customerRepository.findAll();
-		
-		int deactivatedCount = 0;
-		
-		for (Customer customer : customers) {
-			if (customer.isActive()) {
-				boolean hasRecentTransaction = customer.getAccounts().stream().filter(Account::isActive)
-						.anyMatch(account -> transactionRepository.existsBySenderAccountNumberOrReceiverAccountNumberAndTransactionDateAfter(
-										account.getAccountNumber(), account.getAccountNumber(), oneYearAgo));
-
-				if (!hasRecentTransaction) {
-					double totalDeductedBalance = 0;
-					for (Account account : customer.getAccounts()) {
-						if (account.isActive()) {
-							account.setActive(false);
-							totalDeductedBalance += account.getBalance();
+		try {
+			
+			LocalDateTime oneYearAgo = LocalDateTime.now().minusYears(1);
+			
+			List<Customer> customers = customerRepository.findAll();
+			
+			int deactivatedCount = 0;
+			
+			for (Customer customer : customers) {
+				if (customer.isActive()) {
+					boolean hasRecentTransaction = customer.getAccounts().stream().filter(Account::isActive)
+							.anyMatch(account -> transactionRepository.existsBySenderAccountNumberOrReceiverAccountNumberAndTransactionDateAfter(
+											account.getAccountNumber(), account.getAccountNumber(), oneYearAgo));
+	
+					if (!hasRecentTransaction) {
+						double totalDeductedBalance = 0;
+						for (Account account : customer.getAccounts()) {
+							if (account.isActive()) {
+								account.setActive(false);
+								totalDeductedBalance += account.getBalance();
+							}
 						}
+						customer.getAccounts().forEach(account -> account.setActive(false));
+						customer.setActive(false);
+						customer.setTotalBalance(customer.getTotalBalance() - totalDeductedBalance);
+						customerRepository.save(customer);
+						deactivatedCount++;
 					}
-					customer.getAccounts().forEach(account -> account.setActive(false));
-					customer.setActive(false);
-					customer.setTotalBalance(customer.getTotalBalance() - totalDeductedBalance);
-					customerRepository.save(customer);
-					deactivatedCount++;
 				}
+	
 			}
-
+	
+		    return deactivatedCount;
 		}
-
-	    return deactivatedCount;
+		catch(Exception e) {
+			throw new AccountException("Error occurred while deactivating customers");
+		}
 	}
 
 	@Override
 	public int makeInactiveAccounts() {
-		LocalDateTime oneYearAgo = LocalDateTime.now().minusYears(1);
-
-	    List<Customer> customers = customerRepository.findAll();
-
-	    int inactiveAccountsCount = 0;
-
-	    for (Customer customer : customers) {
-	    	if(customer.isActive()) {
-	    		for (Account account : customer.getAccounts()) {
-	    			if(account.isActive()) {
-	    				boolean hasRecentTransaction = transactionRepository.existsBySenderAccountNumberOrReceiverAccountNumberAndTransactionDateAfter(account.getAccountNumber(), account.getAccountNumber(),oneYearAgo);
-
-			            if (!hasRecentTransaction && account.isActive()) {
-			                account.setActive(false);
-			                customer.setTotalBalance(customer.getTotalBalance() - account.getBalance());
-			                accountRepository.save(account);
-			                inactiveAccountsCount++;
-			            }
-	    			}
-		            
-		        }
-	    	}
-	        
-	    }
-
-	    return inactiveAccountsCount;
+		try {
+			LocalDateTime oneYearAgo = LocalDateTime.now().minusYears(1);
+	
+		    List<Customer> customers = customerRepository.findAll();
+	
+		    int inactiveAccountsCount = 0;
+	
+		    for (Customer customer : customers) {
+		    	if(customer.isActive()) {
+		    		for (Account account : customer.getAccounts()) {
+		    			if(account.isActive()) {
+		    				boolean hasRecentTransaction = transactionRepository.existsBySenderAccountNumberOrReceiverAccountNumberAndTransactionDateAfter(account.getAccountNumber(), account.getAccountNumber(),oneYearAgo);
+	
+				            if (!hasRecentTransaction && account.isActive()) {
+				                account.setActive(false);
+				                customer.setTotalBalance(customer.getTotalBalance() - account.getBalance());
+				                accountRepository.save(account);
+				                inactiveAccountsCount++;
+				            }
+		    			}
+			            
+			        }
+		    	}
+		        
+		    }
+	
+		    return inactiveAccountsCount;
+		}
+		catch(Exception e) {
+			throw new AccountException("Error occurred while deactivating customers");
+		}
 	}
 
 	
@@ -396,116 +506,187 @@ public class AdminServiceImpl implements AdminService{
 
 	@Override
 	public void activateAccount(int accountNumber) {
-		Account account = accountRepository.findById(accountNumber).orElseThrow(()->new AccountException("Account does not exists with this account number"));
-		
-		if(account.isActive()) {
-			throw new AccountException("Account is already active");
+		try {
+			
+			Account account = accountRepository.findById(accountNumber).orElseThrow(()->new AccountException("Account does not exists with this account number"));
+			
+			if(account.isActive()) {
+				throw new AccountException("Account is already active");
+			}
+			
+			if(!account.getCustomer().isActive()) {
+				throw new AccountException("Make Customer active first to active this account");
+			}
+	
+			account.setActive(true);
+			account.getCustomer().setTotalBalance(account.getCustomer().getTotalBalance()+account.getBalance());
+			accountRepository.save(account);
 		}
-		
-		if(!account.getCustomer().isActive()) {
-			throw new AccountException("Make Customer active first to active this account");
+		catch(AccountException e) {
+			throw new UserException(e.getMessage());
 		}
-
-		account.setActive(true);
-		account.getCustomer().setTotalBalance(account.getCustomer().getTotalBalance()+account.getBalance());
-		accountRepository.save(account);
+		catch(Exception e) {
+			throw new UserException("Error occurred while activating the account");
+		}
 		
 	}
 	
 	
 	@Override
 	public void activateCustomer(int customerId) {
-		Customer customer = customerRepository.findById(customerId).orElseThrow(()->new AccountException("Customer does not exists with this Id"));
-		
-		if(customer.isActive()) {
-			throw new AccountException("Account is already active");
+		try {
+			Customer customer = customerRepository.findById(customerId).orElseThrow(()->new AccountException("Customer does not exists with this Id"));
+			
+			if(customer.isActive()) {
+				throw new AccountException("Customer is already active");
+			}
+			
+			customer.setActive(true);
+			customerRepository.save(customer);
 		}
-		
-		customer.setActive(true);
-		customerRepository.save(customer);
-		
+		catch(AccountException e) {
+			throw new UserException(e.getMessage());
+		}
+		catch(Exception e) {
+			throw new UserException("Error occurred while activating the customer");
+		}
 	}
 	
 	
 	@Override
 	public int activateAccountsFromRequests() {
-	
-		int countActivatedRequests = 0;
-		List<ActivationRequest> pendingRequests = activationRequestRepository.findByStatusAndRequestType("Pending", "AccountActivation");
-		for (ActivationRequest request : pendingRequests) {
-			
-			Account account = accountRepository.findById(request.getCustomerIdOrAccountNumber()).orElse(null);
-			
-			if(account == null) {
+		
+		try {
+			int countActivatedRequests = 0;
+			List<ActivationRequest> pendingRequests = activationRequestRepository.findByStatusAndRequestType("Pending", "AccountActivation");
+			for (ActivationRequest request : pendingRequests) {
+				
+				Account account = accountRepository.findById(request.getCustomerIdOrAccountNumber()).orElse(null);
+				
+				if(account == null) {
+					request.setStatus("Done");
+					throw new AccountException("No such Account Exist with the account Number "+ request.getCustomerIdOrAccountNumber());
+				}
+				
+				if(account.isActive()) {
+					request.setStatus("Done");
+					throw new AccountException("Account already activated with the account Number "+ request.getCustomerIdOrAccountNumber());
+				}
+				
+				if(!account.getCustomer().isActive()) {
+					request.setStatus("Done");
+					throw new AccountException("Customer with with the account Number "+ request.getCustomerIdOrAccountNumber()+" is inactive. First make Customer Active");
+				}
+				
+				account.setActive(true);
 				request.setStatus("Done");
-				throw new AccountException("No such Account Exist with the account Number "+ request.getCustomerIdOrAccountNumber());
+				activationRequestRepository.save(request);
+				account.getCustomer().setTotalBalance(account.getCustomer().getTotalBalance()+account.getBalance());
+				accountRepository.save(account);
+				countActivatedRequests++;
 			}
 			
-			if(account.isActive()) {
-				request.setStatus("Done");
-				throw new AccountException("Account already activated with the account Number "+ request.getCustomerIdOrAccountNumber());
-			}
-			
-			if(!account.getCustomer().isActive()) {
-				request.setStatus("Done");
-				throw new AccountException("Customer with with the account Number "+ request.getCustomerIdOrAccountNumber()+" is inactive. First make Customer Active");
-			}
-			
-			account.setActive(true);
-			request.setStatus("Done");
-			activationRequestRepository.save(request);
-			account.getCustomer().setTotalBalance(account.getCustomer().getTotalBalance()+account.getBalance());
-			accountRepository.save(account);
-			countActivatedRequests++;
+			return countActivatedRequests;
+		}
+		catch(Exception e) {
+			throw new UserException("Error occurred while activating the accounts");
 		}
 		
-		return countActivatedRequests;
 	}
 
 	
 	@Override
 	public int activateCustomersFromRequests() {
-		int countActivatedRequests = 0;
-
-	    List<ActivationRequest> pendingRequests = activationRequestRepository.findByStatusAndRequestType("Pending", "CustomerActivation");
-	    for (ActivationRequest request : pendingRequests) {
-			
-			Customer customer = customerRepository.findById(request.getCustomerIdOrAccountNumber()).orElse(null);
-			
-			if(customer == null) {
+		try {
+			int countActivatedRequests = 0;
+	
+		    List<ActivationRequest> pendingRequests = activationRequestRepository.findByStatusAndRequestType("Pending", "CustomerActivation");
+		    for (ActivationRequest request : pendingRequests) {
+				
+				Customer customer = customerRepository.findById(request.getCustomerIdOrAccountNumber()).orElse(null);
+				
+				if(customer == null) {
+					request.setStatus("Done");
+					throw new UserException("No such Customer Exist with the Customer Id "+ request.getCustomerIdOrAccountNumber());
+				}
+				
+				if(customer.isActive()) {
+					request.setStatus("Done");
+					throw new UserException("Customer already activated with the Customer Id "+ request.getCustomerIdOrAccountNumber());
+				}
+				
 				request.setStatus("Done");
-				throw new UserException("No such Customer Exist with the Customer Id "+ request.getCustomerIdOrAccountNumber());
+				activationRequestRepository.save(request);
+				customer.setActive(true);
+				customerRepository.save(customer);
+				countActivatedRequests++;
 			}
-			
-			if(customer.isActive()) {
-				request.setStatus("Done");
-				throw new UserException("Customer already activated with the Customer Id "+ request.getCustomerIdOrAccountNumber());
-			}
-			
-			request.setStatus("Done");
-			activationRequestRepository.save(request);
-			customer.setActive(true);
-			customerRepository.save(customer);
-			countActivatedRequests++;
+		    
+		    return countActivatedRequests;
 		}
-	    
-	    return countActivatedRequests;
+		catch(Exception e) {
+			throw new UserException("Error occurred while activating the customers");
+		}
 	    
 	}
 
 	@Override
 	public List<byte[]> getFileContent(int customerId, int fileNumber) {
-		
-		Customer customer = customerRepository.findById(customerId).orElseThrow(()->new AccountException("Customer does not exists with this Id"));
-		
-		List<byte[]> allFiles = fileService.getFiles(customerId);
-		
-		if(allFiles.size() < fileNumber) {
-			throw new UserException("User File does not exists");
+		try {
+			
+			Customer customer = customerRepository.findById(customerId).orElseThrow(()->new AccountException("Customer does not exists with this Id"));
+			
+			List<byte[]> allFiles = fileService.getFiles(customerId);
+			
+			if(allFiles.size() < fileNumber) {
+				throw new UserException("User File does not exists");
+			}
+			return allFiles;
 		}
-		return allFiles;
+		catch (AccountException | UserException e) {
+	        throw new UserException(e.getMessage());
+	    } catch (Exception e) {
+	        throw new UserException("An unexpected error occurred while getting files.");
+	    }
 	}
 
+	
+	
+	@Override
+	public SystemCounts wholeSystemStats() {
+		try {
+			long totalActiveCustomers = customerRepository.countByActiveTrue();
+	        long totalInactiveCustomers = customerRepository.countByActiveFalse();
+	        long totalCustomers = customerRepository.count();
+	        long totalActiveAccounts = accountRepository.countByActiveTrue();
+	        long totalInactiveAccounts = accountRepository.countByActiveFalse();
+	        long totalAccounts = accountRepository.count();
+	        long totalCustomerPendingRequests = activationRequestRepository.countByStatusAndRequestType("Pending", "CustomerActivation");
+	        long totalAccountPendingRequests = activationRequestRepository.countByStatusAndRequestType("Pending", "AccountActivation");
+	        long totalCompletedRequests = activationRequestRepository.countByStatus("Done");
+	        long totalAdmins = adminRepository.count();
+	        
+	        return new SystemCounts(
+	                totalActiveCustomers,
+	                totalInactiveCustomers,
+	                totalActiveAccounts,
+	                totalInactiveAccounts,
+	                totalCustomerPendingRequests,
+	                totalAccountPendingRequests,
+	                totalAdmins,
+	                totalCustomers,
+	                totalAccounts,
+	                totalCompletedRequests
+	            );
+		}
+		catch(Exception e) {
+			throw new UserException("Error getting system stats");
+		}
+        
+	}
+
+	
+	
 	
 	
 
@@ -607,11 +788,6 @@ public class AdminServiceImpl implements AdminService{
 	    account.setActive(accountDTO.isActive());
 	    return account;
 	}
-
-
-
-
-
 
 
 

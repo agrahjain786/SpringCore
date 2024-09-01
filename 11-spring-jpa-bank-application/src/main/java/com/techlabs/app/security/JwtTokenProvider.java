@@ -3,12 +3,17 @@ package com.techlabs.app.security;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import com.techlabs.app.entity.User;
 import com.techlabs.app.exception.ApiException;
+import com.techlabs.app.exception.UserException;
+import com.techlabs.app.repository.UserRepository;
 
 import java.security.Key;
 import java.util.Date;
@@ -21,10 +26,16 @@ public class JwtTokenProvider {
 
     @Value("${app-jwt-expiration-milliseconds}")
     private long jwtExpirationDate;
+    
+    @Autowired
+    private UserRepository userRepository;
 
     // generate JWT token
     public String generateToken(Authentication authentication){
         String username = authentication.getName();
+        
+        User user = userRepository.findByUsernameOrEmail(username, username)
+	            .orElseThrow(() -> new UserException("User not found with username or email: " + username));
 
         Date currentDate = new Date();
 
@@ -32,10 +43,13 @@ public class JwtTokenProvider {
 
         String token = Jwts.builder()
                 .setSubject(username)
+                .claim("roles", user.getRoles())
+                .claim("id", user.getId())
                 .setIssuedAt(new Date())
                 .setExpiration(expireDate)
                 .signWith(key())
                 .compact();
+        
         return token;
     }
 

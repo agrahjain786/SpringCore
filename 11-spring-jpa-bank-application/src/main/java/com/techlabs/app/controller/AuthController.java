@@ -7,12 +7,15 @@ import com.techlabs.app.service.AuthService;
 
 import io.swagger.v3.oas.annotations.Operation;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,12 +35,20 @@ public class AuthController {
     @Operation(summary = "By Anyone: Login the user or admin if have registered and if active")
     @PostMapping(value = {"/login"})
     public ResponseEntity<JWTAuthResponse> login(@RequestBody LoginDTO loginDto){
-        String token = authService.login(loginDto);
+    	JWTAuthResponse jwtAuthResponse = authService.login(loginDto);
         System.out.println(loginDto);
-        JWTAuthResponse jwtAuthResponse = new JWTAuthResponse();
-        jwtAuthResponse.setAccessToken(token);
 
-        return ResponseEntity.ok(jwtAuthResponse);
+        String token = jwtAuthResponse.getAccessToken();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", token);
+
+
+        JWTAuthResponse responseBody = new JWTAuthResponse();
+        responseBody.setTokenType(jwtAuthResponse.getTokenType());
+        responseBody.setRole(jwtAuthResponse.getRole());
+        responseBody.setId(jwtAuthResponse.getId());
+
+        return new ResponseEntity<>(responseBody, headers, HttpStatus.OK);
     }
 
     // Build Register REST API
@@ -48,13 +59,45 @@ public class AuthController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
     
+    
     @Operation(summary = "By Anyone: Make the Request to the admin to make the customer active")
     @PostMapping("/request-activation/{customerId}")
-	public ResponseEntity<String> requestCustomerActivation(@PathVariable(name = "customerId") int customerId) {
-		authService.requestCustomerActivation(customerId);
+	public ResponseEntity<String> requestCustomerActivation(@PathVariable(name = "customerId") int customerId, @RequestBody LoginDTO loginDto) {
+		authService.requestCustomerActivation(customerId, loginDto);
 
 		return new ResponseEntity<String>("Your request to activate the customer has been sent to the admin.",HttpStatus.OK);
 	}
+    
+    
+    @Operation(summary = "By Anyone: Verify Admin")
+    @GetMapping(value = {"/verify/admin/{userId}"})
+    public ResponseEntity<Boolean> isAdmin(@PathVariable(name = "userId")int userId, @RequestHeader("Authorization") String token){
+    	System.out.println("Received Token: " + token);
+    	
+    	if (token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+    	
+    	boolean adminOrNot = authService.isAdmin(token , userId);
+        System.out.println(adminOrNot);
+
+        return ResponseEntity.ok(adminOrNot);
+    }
+    
+    
+    @Operation(summary = "By Anyone: Verify Customer")
+    @GetMapping(value = {"/verify/customer/{userId}"})
+    public ResponseEntity<Boolean> isCustomer(@PathVariable(name = "userId")int userId, @RequestHeader("Authorization") String token){
+    	System.out.println("Received Token: " + token);
+    	
+    	if (token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+    	boolean customerOrNot = authService.isCustomer(token, userId);
+        System.out.println(customerOrNot);
+
+        return ResponseEntity.ok(customerOrNot);
+    }
 
 	
     

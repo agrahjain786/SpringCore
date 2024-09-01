@@ -18,12 +18,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.techlabs.app.dto.TransactionDTO;
-import com.techlabs.app.dto.BalanceDTO;
+import com.techlabs.app.dto.AccountDTO;
 import com.techlabs.app.dto.UserDTO;
 import com.techlabs.app.dto.UserResponseDTO;
 import com.techlabs.app.entity.Transaction;
+import com.techlabs.app.exception.UserException;
 import com.techlabs.app.service.CustomerService;
 import com.techlabs.app.service.TransactionPdfExporter;
+import com.techlabs.app.util.BalancePagedResponse;
 import com.techlabs.app.util.PagedResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -113,12 +115,27 @@ public class CustomerController {
 		
 	}
 	
+	@Operation(summary = "By Customer: Get All Accounts")
+	@GetMapping("/all/accounts")
+	public ResponseEntity<List<AccountDTO>> getAllAccounts(){
+		List<AccountDTO> accounts = customerService.getAllAccounts();
+		
+		return new ResponseEntity<List<AccountDTO>>(accounts, HttpStatus.OK);
+		
+	}
+	
+	
 	@Operation(summary = "By Customer: Get Total and individual balances of the Account")
 	@GetMapping("/balance")
-	public ResponseEntity<BalanceDTO> getTotalAndIndividualBalance(){
-		BalanceDTO balances = customerService.getTotalAndIndividualBalance();
+	public ResponseEntity<BalancePagedResponse<AccountDTO>> getTotalAndIndividualBalance(
+			@RequestParam(name = "page", defaultValue = "0") int page,
+			@RequestParam(name = "size", defaultValue = "5") int size,
+			@RequestParam(name = "sortBy", defaultValue = "accountNumber") String sortBy,
+			@RequestParam(name = "direction", defaultValue = "asc") String direction){
+
+		BalancePagedResponse<AccountDTO> balances = customerService.getTotalAndIndividualBalance(page,size,sortBy,direction);
 		
-		return new ResponseEntity<BalanceDTO>(balances, HttpStatus.CREATED);
+		return new ResponseEntity<BalancePagedResponse<AccountDTO>>(balances, HttpStatus.CREATED);
 		
 	}
 	
@@ -133,21 +150,25 @@ public class CustomerController {
 	@Operation(summary = "By Customer: Download the Passbook in pdf format")
 	@GetMapping("/passbook/download")
 	public ResponseEntity<String> exportPassbookToPDF(HttpServletResponse response) {
-
-		response.setContentType("application/pdf");
-        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
-        String currentDateTime = dateFormatter.format(new Date());
-         
-        String headerKey = "Content-Disposition";
-        String headerValue = "attachment; filename=users_" + currentDateTime + ".pdf";
-        response.setHeader(headerKey, headerValue);
-	    
-        List<Transaction> transactions = customerService.getPassbook();
-        
-        TransactionPdfExporter exporter = new TransactionPdfExporter(transactions);
-        exporter.export(response);
-
-	    return new ResponseEntity<>(HttpStatus.OK);
+		try {
+			response.setContentType("application/pdf");
+	        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+	        String currentDateTime = dateFormatter.format(new Date());
+	         
+	        String headerKey = "Content-Disposition";
+	        String headerValue = "attachment; filename=users_" + currentDateTime + ".pdf";
+	        response.setHeader(headerKey, headerValue);
+		    
+	        List<Transaction> transactions = customerService.getPassbook();
+	        
+	        TransactionPdfExporter exporter = new TransactionPdfExporter(transactions);
+	        exporter.export(response);
+	
+		    return new ResponseEntity<>(HttpStatus.OK);
+		}
+	    catch(Exception e) {
+			throw new UserException("Error occurred while downloading passbook");
+		}
 	}
 	
 	@Operation(summary = "By Customer: Download the Passbook between start date and end date in pdf format")
@@ -172,5 +193,26 @@ public class CustomerController {
 	    return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
+	
+	@Operation(summary = "By Customer: Download the Passbook between start date and end date in pdf format")
+	@GetMapping("/passbook/download/{accountNumber}")
+	public ResponseEntity<String> exportPassbookByAccountNumberToPDF(HttpServletResponse response,
+			@PathVariable(name ="accountNumber") int accountNumber) {
+
+		response.setContentType("application/pdf");
+        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+        String currentDateTime = dateFormatter.format(new Date());
+         
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=users_" + currentDateTime + ".pdf";
+        response.setHeader(headerKey, headerValue);
+	    
+        List<Transaction> transactions = customerService.getPassbookByAccountNumber(accountNumber);
+        
+        TransactionPdfExporter exporter = new TransactionPdfExporter(transactions);
+        exporter.export(response);
+
+	    return new ResponseEntity<>(HttpStatus.OK);
+	}
 	
 }

@@ -3,7 +3,7 @@ package com.techlabs.app.exception;
 import org.springframework.http.HttpStatus;
 
 public class ApiException extends RuntimeException {
-	private static final long serialVersionUID = 1L;
+	
 	private HttpStatus status;
     private String message;
 
